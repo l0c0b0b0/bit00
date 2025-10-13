@@ -51,13 +51,6 @@ To exit the virtual enviromment:
 (root) (bit00) deactivate
 ```
 
-You will then be able to run the `bit00.py` script:
-
-```bash
-(root) python3 bit00.py osint [options]
-(root) python3 bit00.py netscan [options]
-```
-
 ## Usage
 
 BIT00 uses Python 3 specific functionality and does not support Python 2.
@@ -110,10 +103,10 @@ options:
   -t, --targets TARGET_FILE
                         Read targets from a file.
   --only-portscan       Only scan open ports and ips, enumeration services will NOT run. Default: False
-  --profile PROFILE     The port scanning profile the intensity of the scan there are 3 modes: default(TOP1000), full, redteam. Default: default
+  --profile PROFILE     The port scanning profile the intensity of the scan there are 3 modes: default => TOP1000, full => 65535, redteam => TOP100. Default: default
   -o, --output OUTPUT_DIR
                         The output directory for results. Default: recon
-  --only-scans-dir      Only create the "scans" directory for results. Other directories (e.g. exploit, loot, report) will not be created. Default: false
+  --only-scans-dir      Only create the "scans" directory for results. Other directories (e.g. logs, scan) will not be created. Default: false
   --nmap NMAP           Override the {nmap_extra} variable in scans. Default: -vv -Pn
   --nmap-append NMAP_APPEND
                         Append to the default {nmap_extra} variable in scans.
