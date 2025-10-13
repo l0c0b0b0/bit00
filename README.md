@@ -6,6 +6,8 @@ The tool is splited into different modules, like OSINT - NETSCAN. Future work wi
 
 The tool works by firstly performing reconnaissance face before testing each host, even for the OSINT. From those initial results of the reconnaissance, the tool will launch further enumeration scans of those services or targets using a number of different tools.
 
+BITOO does NOT make any exploit o execute any PoC, it only reconnaissance!!!
+
 Everything in the tool is highly configurable. The author will not be held responsible for negative actions that result from the mis-use of this tool.
 
 **Disclaimer: While BIT00 endeavors to perform as much identification and enumeration of services as possible, there is no guarantee that every service will be identified, or that every service will be fully enumerated.**
@@ -35,7 +37,7 @@ sudo apt install python3-venv
 
 ### Supporting Packages
 
-Several commands used in BIT00 may need to be installed, deppending on your OS: 
+Several commands used in BIT00 may need to be installed, deppending on your OS:
 
 * seclist
 * curl
@@ -88,6 +90,7 @@ You can also create a VirtualEnviroment with python3 if you don't want to instal
 (root) source .bit00/bin/activate
 (root) pip install -r requirements.txt
 ```
+
 To exit the virtual enviromment:
 
 ```bash
@@ -105,9 +108,20 @@ You will then be able to run the `bit00.py` script:
 
 BIT00 uses Python 3 specific functionality and does not support Python 2.
 
+* OSINT MODULE
 ```
 
+  bit00.py osint [options]
+
 ```
+
+* NETSCAN MODULE
+```
+
+  bit00.py netscan -t [options] --profile [options] -o [out_dir] -vv
+
+```
+
 
 ### Verbosity
 
@@ -120,15 +134,88 @@ BIT00 supports four levels of verbosity:
 
 ### Results
 
-
 ```
+
+/osint
+└── target.com
+    ├── logs
+    │   ├── _commands.log
+    │   ├── _domainip.csv
+    │   └── _patterns.log
+    └── scans
+        ├── info
+        │   ├── cloud_cloudenum_target.com.csv
+        │   ├── dataleak_metagoofil_target.com.txt
+        │   ├── email_spiderfoot_target.com.ansi
+        │   ├── geolocation_ipapi_10.10.10.10.json
+        │   ├── geolocation_ipapi_10.10.10.11.json
+        │   └── metadata_metagoogil.ansi
+        ├── _manual_commands.txt
+        ├── recon
+        │   ├── cloud_cloudenum_target.com.ansi
+        │   ├── cloud_spiderfoot_target.com.ansi
+        │   ├── dns_dnsrecon_target.com.json
+        │   ├── dns_fierce_target.com.ansi
+        │   ├── dns_host_target.com.ansi
+        │   ├── dns_sublist3r_target.com.txt
+        │   ├── revdns_dig_target.com.ansi
+        │   ├── revdns_dnsrecon_target.com.csv
+        │   └── subdomains_sublist3r_target.com.txt
+        └── tech
+            ├── net_asn_10.10.10.10.json
+            ├── net_asn_10.10.10.11.json
+            ├── web_spiderfoot_target.com.ansi
+            ├── web_spiderfoot_www.target.com.ansi
+            ├── web_spiderfoot_capibara.target.com.ansi
+            ├── web_spiderfoot_plantillas-gobbo-drupal.demo.target.com.ansi
+
+
+./recon
+├── 10.10.10.10
+│   ├── logs
+│   │   ├── _commands.log
+│   │   ├── _draft.log
+│   │   └── _sumportsrv.log
+│   └── scans
+│       ├── gnmap
+│       │   └── _top_1000_tcp_nmap.gnmap
+│       ├── searchsploit-nmap-tcp.ansi
+│       ├── _top_1000_tcp_nmap.txt
+│       └── xml
+│           └── _top_1000_tcp_nmap.xml
+├── 10.10.10.11
+│   ├── logs
+│   │   ├── _commands.log
+│   │   ├── _draft.log
+│   │   └── _sumportsrv.log
+│   └── scans
+│       ├── gnmap
+│       │   └── _top_1000_tcp_nmap.gnmap
+│       ├── _manual_commands.txt
+│       ├── searchsploit-nmap-tcp.ansi
+│       ├── tcp_443_sslscan.txt
+│       ├── tcp_80_http_CMSeek.ansi
+│       ├── tcp_80_http_feroxbuster.txt
+│       ├── tcp_80_http_nmap.txt
+│       ├── tcp_80_http_nuclei.txt
+│       ├── tcp_80_http_robots.txt
+│       ├── tcp_80_http_whatweb.ansi
+│       ├── _top_1000_tcp_nmap.txt
+│       └── xml
+│           ├── tcp_80_http_nmap.xml
+│           └── _top_1000_tcp_nmap.xml
+
 
 ```
 
 The logs directory is where all masscan/nmap scans data will save. This information is only for the port-scan-profiles.toml's commands:
+
 * \_commands.log contains a list of every command BIT00 ran against the target. This is useful if one of the commands fails and you want to run it again with modifications.
+
 * If output matches a defined pattern, two files called \_sumportsrv.log and \_draft.log will also appear in the scans directory with details about the matched output.
+
 * If a scan results in an error, a file called \_errors.log will also appear in the logs directory with some details to alert the user.
 
 Scans directory:
+
 * \_manual_commands.txt contains any commands that are deemed "too dangerous" to run automatically, either because they are too intrusive, require modification based on human analysis, or just work better when there is a human monitoring them.

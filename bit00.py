@@ -11,6 +11,20 @@ from mod._00 import CheckIO
 
 sys.dont_write_bytecode = True
 
+logo = r"""
+ ____    _   _      ___     ___  
+| __ )  (_) | |_   / _ \   / _ \ 
+|  _ \  | | | __| | | | | | | | |
+| |_) | | | | |_  | |_| | | |_| |
+|____/  |_|  \__|  \___/   \___/ 
+
+The network reconnaissance tool with multiple modules.
+aintained as an open source project by @l0c0b0b0
+
+Version : 1.0
+Commit  : Kali Linux                                 
+"""
+
 class Bit00(CheckIO):
     def __init__(self):
         self.modes = {}
@@ -99,13 +113,13 @@ class Bit00(CheckIO):
 
     def parse_arguments(self):
         parser = argparse.ArgumentParser(
-            description='Network reconnaissance tool with multiple operation modes',
+            description=logo,
             formatter_class=argparse.RawDescriptionHelpFormatter,
             epilog="""
-Examples:
-  %(prog)s osint -t targets.txt 
-  %(prog)s netscan -t targets.txt --profile quick 
-  %(prog)s ldap -t targets.txt --domain example.com --username admin --password password
+
+Availables Modules:
+  %(prog)s osint domain.com
+  %(prog)s netscan -t targets --profile (default|full|readteam) -o out_directory -vv
             """
         )
         
