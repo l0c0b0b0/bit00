@@ -130,7 +130,7 @@ ignore-service-names = [
 
     [[http.scan]]
     name = 'nuclei'
-    command = 'nuclei -no-color -silent -no-interactsh -target {scheme}://{address}:{port}/ -rate-limit 50 -concurrency 10 -retries 2 -max-host-error 3 -o "{scandir}/{protocol}_{port}_{scheme}_nuclei.txt"'
+    command = '/usr/bin/nuclei -no-color -silent -no-interactsh -target {scheme}://{address}:{port}/ -rate-limit 50 -concurrency 10 -retries 2 -max-host-error 3 -o "{scandir}/{protocol}_{port}_{scheme}_nuclei.txt"'
 
     [[http.manual]]
     name = 'nikto'
