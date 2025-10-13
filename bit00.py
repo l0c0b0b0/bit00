@@ -11,7 +11,7 @@ from mod._00 import CheckIO
 
 sys.dont_write_bytecode = True
 
-class AutoRecon(CheckIO):
+class Bit00(CheckIO):
     def __init__(self):
         self.modes = {}
         self.executor = None
@@ -238,5 +238,5 @@ Examples:
             self._shutdown(f"Unexpected error: {e}")
 
 if __name__ == '__main__':
-    app = AutoRecon()
+    app = Bit00()
     app.run()
