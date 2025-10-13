@@ -191,7 +191,7 @@ BIT00 supports four levels of verbosity:
             ├── web_spiderfoot_target.com.ansi
             ├── web_spiderfoot_www.target.com.ansi
             ├── web_spiderfoot_capibara.target.com.ansi
-            ├── web_spiderfoot_plantillas-gobbo-drupal.demo.target.com.ansi
+            └── web_spiderfoot_plantillas-gobbo-drupal.demo.target.com.ansi
 
 
 ./recon
