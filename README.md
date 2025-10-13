@@ -12,10 +12,6 @@ Everything in the tool is highly configurable. The author will not be held respo
 
 **Disclaimer: While BIT00 endeavors to perform as much identification and enumeration of services as possible, there is no guarantee that every service will be identified, or that every service will be fully enumerated.**
 
-## Origin
-
-l0c0b0b0_!0X#$%>
-
 ## Installation
 
 BIT00 is a manually installation. Before installation using any of these methods, certain requirements need to be fulfilled. If you have not refreshed your apt cache recently, run the following command so you are installing the latest available packages:
@@ -34,43 +30,6 @@ sudo apt install python3
 sudo apt install python3-pip
 sudo apt install python3-venv
 ```
-
-### Supporting Packages
-
-Several commands used in BIT00 may need to be installed, deppending on your OS:
-
-| OSINT TOOLS | NETSCAN TOOLS |
-|----------|----------|
-|   spiderfoot    |   seclist     |
-|   dnsrecon      |   curl        |
-|   fierce        |   dnsrecon    |
-|   cloud_enum    |   gobuster    |
-|   asn           |   feroxbuster |
-|   metagoofil    |   kerberoast  |
-|   dnsutils      |   cmseek      |
-|                 |   masscan     |
-|                 |   enum4linux  |
-|                 |   gobuster    |
-|                 |   impacket-scripts  |
-|                 |   nbtscan           |
-|                 |   nmap        |
-|                 |   redis-tools |
-|                 |     smbclient     |
-|                 | smbmap      |
-|                 | snmpwalk    |
-|                 |   sslscan   |
-|                 | svwar   |
-|                 | whatweb |
-|                 | nuclei  |
-|                 | netexec |
-
-
-On Kali Linux, you can ensure these are all installed using the following commands:
-
-```bash
-sudo apt install seclists curl dnsrecon enum4linux feroxbuster gobuster impacket-scripts nbtscan nmap redis-tools smbclient smbmap snmp sslscan sipvicious whatweb cmseek nuclei netexec spiderfoot dnsrecon fierce cloud_enum asn metagoofil dnsutils
-```
-
 ### Installation Method: Manually
 Install and execute `bit00.py` from within the RECON directory, install the dependencies:
 
@@ -158,6 +117,42 @@ options:
   --nmap NMAP           Override the {nmap_extra} variable in scans. Default: -vv -Pn
   --nmap-append NMAP_APPEND
                         Append to the default {nmap_extra} variable in scans.
+```
+
+### Supporting Packages
+
+Several commands used in BIT00 may need to be installed, deppending on your OS:
+
+| OSINT TOOLS | NETSCAN TOOLS |
+|----------|----------|
+|   spiderfoot    |   seclist     |
+|   dnsrecon      |   curl        |
+|   fierce        |   dnsrecon    |
+|   cloud_enum    |   gobuster    |
+|   asn           |   feroxbuster |
+|   metagoofil    |   kerberoast  |
+|   dnsutils      |   cmseek      |
+|                 |   masscan     |
+|                 |   enum4linux  |
+|                 |   gobuster    |
+|                 |   impacket-scripts  |
+|                 |   nbtscan           |
+|                 |   nmap        |
+|                 |   redis-tools |
+|                 |     smbclient     |
+|                 | smbmap      |
+|                 | snmpwalk    |
+|                 |   sslscan   |
+|                 | svwar   |
+|                 | whatweb |
+|                 | nuclei  |
+|                 | netexec |
+
+
+On Kali Linux, you can ensure these are all installed using the following commands:
+
+```bash
+sudo apt install seclists curl dnsrecon enum4linux feroxbuster gobuster impacket-scripts nbtscan nmap redis-tools smbclient smbmap snmp sslscan sipvicious whatweb cmseek nuclei netexec spiderfoot dnsrecon fierce cloud_enum asn metagoofil dnsutils
 ```
 
 
