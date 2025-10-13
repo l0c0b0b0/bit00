@@ -376,6 +376,10 @@ class CheckIO(ABC):
             elapsed_time.append('less than a second')
         return ', '.join(elapsed_time)  
     
+    # =============================================================================
+    # EXTRACT PORT FROM NMAP, MASCAN
+    # =============================================================================
+    
     def extract_port(self, line_text: str, tag: str = '') -> str:
         # Prefer port embedded in the task tag (e.g., "tcp/80/…")
         if isinstance(tag, str):
@@ -389,6 +393,10 @@ class CheckIO(ABC):
                 return m.group('port')
         return ''
     
+    # =============================================================================
+    # PARSE NMAP LINE
+    # =============================================================================
+
     def parse_service_line(self, line: str):
         """Parse Nmap service detection line"""
         m = self.NMAP_SERVICE_LINE.search(line)
@@ -414,12 +422,20 @@ class CheckIO(ABC):
         version = re.sub(r'\s{2,}', ' ', version)
         return port, service, version, ttl
     
+    # =============================================================================
+    # APPEND VULNS FROM SERVICES SCAN INTO A FILE _SUMPORTSRV.LOG
+    # =============================================================================
+    
     def append_sumportsrv(self, port, service, version, ttl):
         """Append service summary to CSV log"""
         log_path = os.path.join(self.logdir, '_sumportsrv.log')
         with open(log_path, 'a') as f:
             f.write(f'{self.address},{port},{service},{version},{ttl}\n')
     
+    # =============================================================================
+    # APPEND RECON SCAN INTO A FILE _DRAFT.LOG
+    # =============================================================================
+
     def append_draft_line(self, protocol, port, service, version, ttl):
         """Append human-readable service info to draft log"""
         ttl_part = f' ({ttl})' if ttl else ''

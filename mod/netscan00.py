@@ -1,10 +1,13 @@
 import asyncio
+import sys
 import os
 import re
 import time
 from mod._00 import CheckIO
 from colorama import Fore, Style
 from concurrent.futures import FIRST_COMPLETED
+
+sys.dont_write_bytecode = True
 
 class NetScan(CheckIO):
     def __init__(self, args):

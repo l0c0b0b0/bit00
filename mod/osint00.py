@@ -1,4 +1,5 @@
 import os
+import sys
 import re
 import socket
 import time
@@ -8,6 +9,7 @@ from mod._00 import CheckIO
 from colorama import Fore, Style
 from concurrent.futures import FIRST_COMPLETED
 
+sys.dont_write_bytecode = True
 # Import from bit00 without circular dependency by not importing at module level
 # We'll import inside functions or use dependency injection
 

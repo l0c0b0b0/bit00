@@ -1,12 +1,14 @@
-# AutoRecon
+# BIT00
 
-AutoRecon is a multi-threaded reconnaissance tool which performs automated enumeration of subdomains, ports, emails and vulnerabilities. It is intended as a time-saving tool on penetration testing.
+BIT00 is a multi-threaded reconnaissance tool which performs automated enumeration of osint, subdomains, ports, emails and vulnerabilities. It is intended as a time-saving tool on penetration testing.
 
-The tool works by firstly performing port scans /service detection scans. From those initial results, the tool will launch further enumeration scans of those services using a number of different tools.
+The tool is splited into different modules, like OSINT - NETSCAN. Future work will be implemented LDAP for internal enumeration.
+
+The tool works by firstly performing reconnaissance face before testing each host, even for the OSINT. From those initial results of the reconnaissance, the tool will launch further enumeration scans of those services or targets using a number of different tools.
 
 Everything in the tool is highly configurable. The author will not be held responsible for negative actions that result from the mis-use of this tool.
 
-**Disclaimer: While Autorecon endeavors to perform as much identification and enumeration of services as possible, there is no guarantee that every service will be identified, or that every service will be fully enumerated.**
+**Disclaimer: While BIT00 endeavors to perform as much identification and enumeration of services as possible, there is no guarantee that every service will be identified, or that every service will be fully enumerated.**
 
 ## Origin
 
@@ -14,7 +16,7 @@ l0c0b0b0_!0X#$%>
 
 ## Installation
 
-AutoRecon is a manually installation. Before installation using any of these methods, certain requirements need to be fulfilled. If you have not refreshed your apt cache recently, run the following command so you are installing the latest available packages:
+BIT00 is a manually installation. Before installation using any of these methods, certain requirements need to be fulfilled. If you have not refreshed your apt cache recently, run the following command so you are installing the latest available packages:
 
 
 ```bash
@@ -23,7 +25,7 @@ sudo apt update
 
 ### Python3 
 
-AutoRecon requires the usage of Python3.8+ and pip, which can be installed on Kali Linux using the following commands:
+BIT00 requires the usage of Python3.8+ and pip, which can be installed on Kali Linux using the following commands:
 
 ```bash
 sudo apt install python3
@@ -33,7 +35,7 @@ sudo apt install python3-venv
 
 ### Supporting Packages
 
-Several commands used in AutoRecon may need to be installed, deppending on your OS: 
+Several commands used in BIT00 may need to be installed, deppending on your OS: 
 
 * seclist
 * curl
@@ -55,124 +57,76 @@ Several commands used in AutoRecon may need to be installed, deppending on your 
 * sslscan
 * svwar
 * whatweb
+* spiderfoot
+* dnsrecon
+* fierce
+* cloud_enum
+* asn
+* metagoofil
+* dnsutils
 * nuclei
 * netexec
-
 
 
 On Kali Linux, you can ensure these are all installed using the following commands:
 
 ```bash
-sudo apt install seclists curl dnsrecon enum4linux feroxbuster gobuster impacket-scripts nbtscan nmap redis-tools smbclient smbmap snmp sslscan sipvicious whatweb cmseek nuclei netexec
+sudo apt install seclists curl dnsrecon enum4linux feroxbuster gobuster impacket-scripts nbtscan nmap redis-tools smbclient smbmap snmp sslscan sipvicious whatweb cmseek nuclei netexec spiderfoot dnsrecon fierce cloud_enum asn metagoofil dnsutils
 ```
 
 ### Installation Method: Manually
-Install and execute `autorecon.py` from within the RECON directory, install the dependencies:
+Install and execute `bit00.py` from within the RECON directory, install the dependencies:
 
 ```bash
 (root) pip install -r requirements.txt
 ```
 
-You can also create a VirtualEnviroment with python3:
+You can also create a VirtualEnviroment with python3 if you don't want to install on your OS the packages:
 
 ```bash
-(root) python3 -m venv .autorecon
-(root) source .autorecon/bin/activate
+(root) python3 -m venv .bit00
+(root) source .bit00/bin/activate
 (root) pip install -r requirements.txt
 ```
 To exit the virtual enviromment:
 
 ```bash
-(root) (autorecon) deactivate
+(root) (bit00) deactivate
 ```
 
-You will then be able to run the `autorecon.py` script:
+You will then be able to run the `bit00.py` script:
 
 ```bash
-(root) python3 autorecon.py iptarget [options]
+(root) python3 bit00.py osint [options]
+(root) python3 bit00.py netscan [options]
 ```
 
 ## Usage
 
-AutoRecon uses Python 3 specific functionality and does not support Python 2.
+BIT00 uses Python 3 specific functionality and does not support Python 2.
 
 ```
-usage: autorecon.py [-h] [-t TARGET_FILE] [-ct <number>] [-cs <number>] [--profile PROFILE_NAME] [-o OUTPUT_DIR] [--single-target] [--only-scans-dir] [--nmap NMAP | --nmap-append NMAP_APPEND] [-v] [--disable-sanity-checks]
-                    [targets ...]
 
-Network reconnaissance tool to port scan and automatically enumerate services found on multiple targets.
-
-positional arguments:
-  targets               IP addresses (e.g. 10.0.0.1), CIDR notation (e.g. 10.0.0.1/24), or resolvable hostnames (e.g. foo.bar) to scan.
-
-options:
-  -h, --help            show this help message and exit
-  -t, --targets TARGET_FILE
-                        Read targets from file.
-  -ct, --concurrent-targets <number>
-                        The maximum number of target hosts to scan concurrently. Default: 5
-  -cs, --concurrent-scans <number>
-                        The maximum number of scans to perform per target host. Default: 10
-  --profile PROFILE_NAME
-                        The port scanning profile to use (defined in port-scan-profiles.toml). Default: default
-  -o, --output OUTPUT_DIR
-                        The output directory for results. Default: recon
-  --single-target       Only scan a single target. A directory named after the target will not be created. Instead, the directory structure will be created within the output directory. Default: false
-  --only-scans-dir      Only create the "scans" directory for results. Other directories (e.g. exploit, loot, report) will not be created. Default: false
-  --nmap NMAP           Override the {nmap_extra} variable in scans. Default: -vv -Pn
-  --nmap-append NMAP_APPEND
-                        Append to the default {nmap_extra} variable in scans.
-  -v, --verbose         Enable verbose output. Repeat for more verbosity.
-  --disable-sanity-checks
-                        Disable sanity checks that would otherwise prevent the scans from running. Default: false
 ```
 
 ### Verbosity
 
-AutoRecon supports four levels of verbosity:
+BIT00 supports four levels of verbosity:
 
-* (none) Minimal output. AutoRecon will announce when scanning targets starts / ends.
-* (-v) Verbose output. AutoRecon will additionally announce when plugins start running, and report found.
-* (-vv) Very verbose output. AutoRecon will additionally specify the exact commands which are being run by plugins, highlight any patterns which are matched in command output, and announce when plugins end.
-* (-vvv) Very, very verbose output. AutoRecon will output everything. Literally every line from all commands which are currently running. When scanning multiple targets concurrently, this can lead to a ridiculous amount of output. It is not advised to use -vvv unless you absolutely need to see live output from commands.
+* (none) Minimal output. BIT00 will announce when scanning targets starts / ends.
+* (-v) Verbose output. BIT00 will additionally announce when plugins start running, and report found.
+* (-vv) Very verbose output. BIT00 will additionally specify the exact commands which are being run by plugins, highlight any patterns which are matched in command output, and announce when plugins end.
+* (-vvv) Very, very verbose output. BIT00 will output everything. Literally every line from all commands which are currently running. When scanning multiple targets concurrently, this can lead to a ridiculous amount of output. It is not advised to use -vvv unless you absolutely need to see live output from commands.
 
 ### Results
 
-By default, results will be stored in the ./recon directory. A new sub directory is created for every target. The structure of this sub directory is:
 
 ```
-./recon
-├── targetip
-│   ├── logs
-│   │   ├── _commands.log
-│   │   ├── _draft.log
-│   │   ├── _sumportsrv.log
-│   │   └── _vulns.log
-│   └── scans
-│       ├── gnmap
-│       │   └── _top_1000_tcp_nmap.gnmap
-│       ├── _manual_commands.txt
-│       ├── searchsploit-nmap-tcp.ansi
-│       ├── tcp_80_http_CMSeek.ansi
-│       ├── tcp_80_http_feroxbuster.txt
-│       ├── tcp_80_http_nmap.txt
-│       ├── tcp_80_http_nuclei.txt
-│       ├── tcp_80_http_robots.txt
-│       ├── tcp_80_http_whatweb.ansi
-│       ├── tcp_445_smb_netexec.ansi
-│       ├── _top_1000_tcp_masscan.txt
-│       ├── _top_1000_tcp_nmap.txt
-│       └── xml                                                                                                                
-│           ├── tcp_80_http_nmap.xml
-│           └── _top_1000_tcp_nmap.xml
-└── results                                                                                                                    
-    ├── result.csv                                                                                                             
-    ├── result.txt                                                                                                             
-    └── vulns.csv
+
 ```
 
 The logs directory is where all masscan/nmap scans data will save. This information is only for the port-scan-profiles.toml's commands:
-* \_commands.log contains a list of every command AutoRecon ran against the target. This is useful if one of the commands fails and you want to run it again with modifications.
+* \_commands.log contains a list of every command BIT00 ran against the target. This is useful if one of the commands fails and you want to run it again with modifications.
 * If output matches a defined pattern, two files called \_sumportsrv.log and \_draft.log will also appear in the scans directory with details about the matched output.
 * If a scan results in an error, a file called \_errors.log will also appear in the logs directory with some details to alert the user.
 
