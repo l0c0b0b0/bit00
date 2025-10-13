@@ -39,35 +39,30 @@ sudo apt install python3-venv
 
 Several commands used in BIT00 may need to be installed, deppending on your OS:
 
-* seclist
-* curl
-* dnsrecon
-* gobuster
-* feroxbuster
-* kerberoast
-* cmseek
-* masscan
-* enum4linux
-* gobuster
-* impacket-scripts
-* nbtscan
-* nmap
-* redis-tools
-* smbclient
-* smbmap
-* snmpwalk
-* sslscan
-* svwar
-* whatweb
-* spiderfoot
-* dnsrecon
-* fierce
-* cloud_enum
-* asn
-* metagoofil
-* dnsutils
-* nuclei
-* netexec
+| OSINT TOOLS | NETSCAN TOOLS |
+|----------|----------|
+|   spiderfoot    |   seclist     |
+|   dnsrecon      |   curl        |
+|   fierce        |   dnsrecon    |
+|   cloud_enum    |   gobuster    |
+|   asn           |   feroxbuster |
+|   metagoofil    |   kerberoast  |
+|   dnsutils      |   cmseek      |
+|                 |   masscan     |
+|                 |   enum4linux  |
+|                 |   gobuster    |
+|                 |   impacket-scripts  |
+|                 |   nbtscan           |
+|                 |   nmap        |
+|                 |   redis-tools |
+|                 |     smbclient     |
+|                 | smbmap      |
+|                 | snmpwalk    |
+|                 |   sslscan   |
+|                 | svwar   |
+|                 | whatweb |
+|                 | nuclei  |
+|                 | netexec |
 
 
 On Kali Linux, you can ensure these are all installed using the following commands:
@@ -226,7 +221,7 @@ BIT00 supports four levels of verbosity:
 │       ├── _top_1000_tcp_nmap.txt
 │       └── xml
 │           └── _top_1000_tcp_nmap.xml
-├── 10.10.10.11
+└── 10.10.10.11
     ├── logs
     │   ├── _commands.log
     │   ├── _draft.log
