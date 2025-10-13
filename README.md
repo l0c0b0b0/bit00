@@ -245,4 +245,4 @@ Scans directory:
 * \_manual_commands.txt contains any commands that are deemed "too dangerous" to run automatically, either because they are too intrusive, require modification based on human analysis, or just work better when there is a human monitoring them.
 
 > [!NOTE]
-> BIT00 does NOT make any exploit o execute any PoC, its only reconnaissances!!!
+> BIT00 does NOT make any exploit o execute any PoC, its only reconnaissance!!!
