@@ -109,17 +109,60 @@ You will then be able to run the `bit00.py` script:
 BIT00 uses Python 3 specific functionality and does not support Python 2.
 
 * OSINT MODULE
+
 ```
+usage: bit00.py osint [-h] [-v] [-ct <number>] [-cs <number>] [--disable-sanity-checks] [-t TARGET_FILE] [-o OUTPUT_DIR] [--only-scans-dir] [targets ...]
 
-  bit00.py osint [options]
+Perform OSINT reconnaissance to a domain
 
+positional arguments:
+  targets               Resolvable Hostname, IP addresses or CIDR notation.
+
+options:
+  -h, --help            show this help message and exit
+  -v, --verbose         Enable verbose output. Repeat for more verbosity.
+  -ct, --concurrent-targets <number>
+                        The maximum number of target hosts to scan concurrently. Default: 5
+  -cs, --concurrent-scans <number>
+                        The maximum number of scans to perform per target host. Default: 10
+  --disable-sanity-checks
+                        Disable sanity checks for large target ranges
+  -t, --targets TARGET_FILE
+                        Read targets from file
+  -o, --output OUTPUT_DIR
+                        The output directory for results. Default: osint
+  --only-scans-dir      Only create the "scans" directory for results.
 ```
 
 * NETSCAN MODULE
+
 ```
+usage: bit00.py netscan [-h] [-v] [-ct <number>] [-cs <number>] [--disable-sanity-checks] [-t TARGET_FILE] [--only-portscan] [--profile PROFILE] [-o OUTPUT_DIR] [--only-scans-dir] [--nmap NMAP | --nmap-append NMAP_APPEND] [targets ...]
 
-  bit00.py netscan -t [options] --profile [options] -o [out_dir] -vv
+Network reconnaissance tool to port scan and automatically enumerate services on multiple targets.
 
+positional arguments:
+  targets               IP addresses (e.g. 10.0.0.1), CIDR notation (e.g. 10.0.0.1/24), or resolvable hostnames (e.g. foo.bar) to scan.
+
+options:
+  -h, --help            show this help message and exit
+  -v, --verbose         Enable verbose output. Repeat for more verbosity.
+  -ct, --concurrent-targets <number>
+                        The maximum number of target hosts to scan concurrently. Default: 5
+  -cs, --concurrent-scans <number>
+                        The maximum number of scans to perform per target host. Default: 10
+  --disable-sanity-checks
+                        Disable sanity checks for large target ranges
+  -t, --targets TARGET_FILE
+                        Read targets from a file.
+  --only-portscan       Only scan open ports and ips, enumeration services will NOT run. Default: False
+  --profile PROFILE     The port scanning profile the intensity of the scan there are 3 modes: default(TOP1000), full, redteam. Default: default
+  -o, --output OUTPUT_DIR
+                        The output directory for results. Default: recon
+  --only-scans-dir      Only create the "scans" directory for results. Other directories (e.g. exploit, loot, report) will not be created. Default: false
+  --nmap NMAP           Override the {nmap_extra} variable in scans. Default: -vv -Pn
+  --nmap-append NMAP_APPEND
+                        Append to the default {nmap_extra} variable in scans.
 ```
 
 
@@ -184,26 +227,26 @@ BIT00 supports four levels of verbosity:
 │       └── xml
 │           └── _top_1000_tcp_nmap.xml
 ├── 10.10.10.11
-│   ├── logs
-│   │   ├── _commands.log
-│   │   ├── _draft.log
-│   │   └── _sumportsrv.log
-│   └── scans
-│       ├── gnmap
-│       │   └── _top_1000_tcp_nmap.gnmap
-│       ├── _manual_commands.txt
-│       ├── searchsploit-nmap-tcp.ansi
-│       ├── tcp_443_sslscan.txt
-│       ├── tcp_80_http_CMSeek.ansi
-│       ├── tcp_80_http_feroxbuster.txt
-│       ├── tcp_80_http_nmap.txt
-│       ├── tcp_80_http_nuclei.txt
-│       ├── tcp_80_http_robots.txt
-│       ├── tcp_80_http_whatweb.ansi
-│       ├── _top_1000_tcp_nmap.txt
-│       └── xml
-│           ├── tcp_80_http_nmap.xml
-│           └── _top_1000_tcp_nmap.xml
+    ├── logs
+    │   ├── _commands.log
+    │   ├── _draft.log
+    │   └── _sumportsrv.log
+    └── scans
+        ├── gnmap
+        │   └── _top_1000_tcp_nmap.gnmap
+        ├── _manual_commands.txt
+        ├── searchsploit-nmap-tcp.ansi
+        ├── tcp_443_sslscan.txt
+        ├── tcp_80_http_CMSeek.ansi
+        ├── tcp_80_http_feroxbuster.txt
+        ├── tcp_80_http_nmap.txt
+        ├── tcp_80_http_nuclei.txt
+        ├── tcp_80_http_robots.txt
+        ├── tcp_80_http_whatweb.ansi
+        ├── _top_1000_tcp_nmap.txt
+        └── xml
+            ├── tcp_80_http_nmap.xml
+            └── _top_1000_tcp_nmap.xml
 
 
 ```
