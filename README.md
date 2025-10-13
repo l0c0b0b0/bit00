@@ -6,7 +6,8 @@ The tool is splited into different modules, like OSINT - NETSCAN. Future work wi
 
 The tool works by firstly performing reconnaissance face before testing each host, even for the OSINT. From those initial results of the reconnaissance, the tool will launch further enumeration scans of those services or targets using a number of different tools.
 
-BITOO does NOT make any exploit o execute any PoC, it only reconnaissance!!!
+> [!NOTE]
+> BIT00 does NOT make any exploit o execute any PoC, its only reconnaissances!!!
 
 Everything in the tool is highly configurable. The author will not be held responsible for negative actions that result from the mis-use of this tool.
 
