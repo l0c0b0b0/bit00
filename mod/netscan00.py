@@ -288,6 +288,7 @@ class NetScan(CheckIO):
                             nmap_extra=self.nmap_extra, address=self.address, scandir=self.scandir
                             )
             command = ps_command
+            print(command)
                 
             self.info('Running port scan {bgreen}{tag}{rst} on {byellow}{address}{rst}', tag=tag, address=self.address)
             with open(os.path.join(self.logdir, '_commands.log'), 'a') as file:
@@ -377,8 +378,14 @@ class NetScan(CheckIO):
 
                             self.info('Found {bmagenta}{service}{rst} on {bmagenta}{protocol}/{port}{rst} on target {byellow}{address}{rst}',
                                      service=service, protocol=protocol, port=port, address=self.address)
+                            
+                            if not self.port_scan:
+                                await self.scan_services(semaphore, service=service, protocol=protocol, port=port)                        
+                            else:
+                                self.info('Running only portscan for {byellow}{address}{rst}', address=self.address)
+                                continue
 
-                            await self.scan_services(semaphore, service=service, protocol=protocol, port=port)                        
+                            #await self.scan_services(semaphore, service=service, protocol=protocol, port=port)                        
                 except AttributeError as e:
                     self.error('Attribute error in task result: {error}', error=str(e))
                 except Exception as e:
@@ -388,12 +395,7 @@ class NetScan(CheckIO):
         """Async execution entry point"""
         self.lock = asyncio.Lock()
         semaphore = asyncio.Semaphore(concurrent_scans)
-        
-        if self.port_scan:
-            self.info('Running port scan only for {byellow}{address}{rst}', address=self.address)
-            # Implement port-scan only logic here if needed
-        else:
-            await self.scannet(semaphore)
+        await self.scannet(semaphore)
     
     def execute(self, target, concurrent_scans):
         """Main execution method"""
