@@ -14,7 +14,7 @@
     # Masscan is very noise as is a complete full tcp port scan, --rate = 10000
     [full.masscan-full]
         descripion = 'Masscan TOP-PORTS => 65535'
-        command = 'masscan --rate 10000 -p- {address}   | tee "{scandir}/_full_tcp_masscan.txt"'
+        command = 'masscan --rate 1000 -p- {address}   | tee "{scandir}/_full_tcp_masscan.txt"'
 
     [full.nmap-full]
         descripion = 'Nmap TOP-PORTS => 65535'
