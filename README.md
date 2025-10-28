@@ -143,7 +143,7 @@ Several commands used in BIT00 may need to be installed, deppending on your OS:
 On Kali Linux, you can ensure these are all installed using the following commands:
 
 ```bash
-sudo apt install seclists curl dnsrecon enum4linux feroxbuster gobuster impacket-scripts nbtscan nmap redis-tools smbclient smbmap snmp sslscan sipvicious whatweb cmseek nuclei netexec spiderfoot dnsrecon fierce cloud_enum asn metagoofil dnsutils
+sudo apt install seclists curl dnsrecon enum4linux feroxbuster gobuster impacket-scripts nbtscan nmap redis-tools smbclient smbmap snmp sslscan sipvicious whatweb cmseek nuclei netexec spiderfoot dnsrecon fierce cloud-enum asn metagoofil dnsutils
 ```
 
 
