@@ -5,7 +5,7 @@ def mod_args(subparsers: argparse._SubParsersAction, parents: list) -> argparse.
     netscan_parser = subparsers.add_parser('netscan', parents=parents, description='Network reconnaissance tool to port scan and automatically enumerate services on multiple targets.')
     netscan_parser.add_argument('targets', action='store', 
                                 help='IP addresses (e.g. 10.0.0.1), CIDR notation (e.g. 10.0.0.1/24), or resolvable hostnames (e.g. foo.bar) to scan.', nargs='*')
-    netscan_parser.add_argument('--only-portscan', action='store_true', default=False, dest='only_portscan',help='Only scan open ports and ips, enumeration services will NOT run. Default: %(default)s')
+    netscan_parser.add_argument('-ops','--only-portscan', action='store_true', default=False, dest='only_portscan',help='Only scan open ports and ips, enumeration services will NOT run. Default: %(default)s')
     netscan_parser.add_argument('-p','--profile', action='store', default='default', dest='profile', help='The port scanning profiles: default(TCP TOP1000),full(TCP 65535). Ex.bit00.py netscan <ipaddress> -p full Default: %(default)s')
     netscan_parser.add_argument('-L', '--list-plugins', action='store_true', default=False, dest='list_plugins',
                                   help='List all available OSINT plugins')

@@ -11,6 +11,7 @@ from helpers.io import error, info, fail
 from helpers.utils import parse_targets, calculate_elapsed_time
 from loaders.pluginsloaders import PluginLoader
 from loaders.modulesloaders import ModulesLoader
+from loaders.reportsloaders import DoReports
 
 m_loader = ModulesLoader()
 p_loader = PluginLoader()
@@ -41,6 +42,7 @@ async def start_run(module, args, targets):  # noqa: RUF029
             for future in as_completed(futures):
                 try:
                     result = future.result()
+                    #DoReports(args.module)
                     info('{bgreen}Finished all targets in {elapsed_time}!{rst}', 
                           elapsed_time=calculate_elapsed_time(start_time))
                 except Exception as e:
