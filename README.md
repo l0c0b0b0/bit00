@@ -8,8 +8,8 @@ The tool works by firstly performing reconnaissance face before testing each hos
 
 Everything in the tool is highly configurable. The author will not be held responsible for negative actions that result from the mis-use of this tool.
 
-> [!Disclaimer]
-> While BIT00 endeavors to perform as much identification and enumeration of services as possible, there is no guarantee that every service will be > identified, or that every service will be fully enumerated.
+> Disclaimer:
+> While BIT00 endeavors to perform as much identification and enumeration of services as possible, there is no guarantee that every service will be identified, or that every service will be fully enumerated.
 
 ## Installation
 
