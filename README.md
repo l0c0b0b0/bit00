@@ -167,7 +167,7 @@ BIT00 supports four levels of verbosity:
 ├── osint.xml
 ├── osint.md
 ├── osint
-│   └── agetic.gob.bo
+│   └── patito.com
 │       ├── logs
 │       │   ├── commands.log
 │       │   ├── error.log
