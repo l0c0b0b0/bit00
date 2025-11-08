@@ -3,10 +3,11 @@ import json
 import xml.etree.ElementTree as ET
 from collections import defaultdict
 import re
+from helpers.io import error, debug, warn, info
 
 def generate_reports(patterns_log_paths, output_dir):
     """Generate OSINT reports from multiple patterns.log files"""
-    print(f"Generating OSINT reports from {len(patterns_log_paths)} log files")
+    debug(f"Generating OSINT reports from {len(patterns_log_paths)} log files")
     
     parser = OSINTParser()
     
@@ -15,13 +16,13 @@ def generate_reports(patterns_log_paths, output_dir):
     all_basedomains = set()
     
     for log_path in patterns_log_paths:
-        print(f"Processing OSINT log: {log_path}")
+        debug(f"Processing OSINT log: {log_path}")
         if not os.path.exists(log_path):
             print(f"  ✗ Log file not found: {log_path}")
             continue
             
         file_size = os.path.getsize(log_path)
-        print(f"  ✓ Log file size: {file_size} bytes")
+        debug(f"  ✓ Log file size: {file_size} bytes")
         
         osint_data, basedomains = parser.parse_osint_data(log_path)
         
@@ -29,23 +30,23 @@ def generate_reports(patterns_log_paths, output_dir):
             all_basedomains.add(domain)
         
         if not osint_data:
-            print(f"  ⚠ No OSINT data found in: {log_path}")
+            error(f"  ⚠ No OSINT data found in: {log_path}")
             continue
             
         # Merge data from all logs
         for target, data in osint_data.items():
-            print(f"  Found target: {target} with {sum(len(entries) for entries in data.values())} entries")
+            debug(f"  Found target: {target} with {sum(len(entries) for entries in data.values())} entries")
             for data_type, entries in data.items():
                 # Add only unique entries
                 for entry in entries:
                     if not _is_duplicate_entry(all_osint_data[target][data_type], entry):
                         all_osint_data[target][data_type].append(entry)
     
-    print(f"Total targets found: {len(all_osint_data)}")
-    print(f"Base domains: {list(all_basedomains)}")
+    #info("Base domains: {byellow}{base_domain}{rst}", base_domain=list(all_basedomains))
+    info("Total subdomains found: {byellow}{num}{rst}", num=len(all_osint_data))
     
     if not all_osint_data:
-        print("⚠ No OSINT data found in any log files!")
+        error("⚠ No OSINT data found in any log files!")
         # Create empty reports with message
         create_empty_reports(output_dir, "osint", "No OSINT data found in log files")
         return
@@ -115,10 +116,10 @@ class OSINTParser:
                     osint_entries += 1
                     self._process_osint_entry(plugin, desc, target, content)
             
-            print(f"  Processed {osint_entries} OSINT entries")
+            debug(f"  Processed {osint_entries} OSINT entries")
             
         except Exception as e:
-            print(f"  ✗ Error parsing log file: {e}")
+            error(f"  ✗ Error parsing log file: {e}")
             import traceback
             traceback.print_exc()
         
@@ -347,7 +348,7 @@ def generate_osint_markdown(osint_data, basedomains, output_dir):
     output_path = os.path.join(output_dir, "osint.md")
     with open(output_path, 'w', encoding='utf-8') as f:
         f.write('\n'.join(content))
-    print(f"✓ OSINT Markdown report generated: {output_path}")
+    info("OSINT Markdown report generated: {bgreen}{output_path}{rst}")
 
 def generate_osint_json(osint_data, basedomains, output_dir):
     """Generate OSINT JSON report"""
@@ -386,7 +387,7 @@ def generate_osint_json(osint_data, basedomains, output_dir):
     output_path = os.path.join(output_dir, "osint.json")
     with open(output_path, 'w', encoding='utf-8') as f:
         json.dump(report, f, indent=2, ensure_ascii=False)
-    print(f"✓ OSINT JSON report generated: {output_path}")
+    info("OSINT JSON report generated: {bgreen}{output_path}{rst}")
 
 def generate_osint_xml(osint_data, basedomains, output_dir):
     """Generate OSINT XML report"""
@@ -429,7 +430,7 @@ def generate_osint_xml(osint_data, basedomains, output_dir):
     output_path = os.path.join(output_dir, "osint.xml")
     tree = ET.ElementTree(root)
     tree.write(output_path, encoding='utf-8', xml_declaration=True)
-    print(f"✓ OSINT XML report generated: {output_path}")
+    info("OSINT XML report generated: {bgreen}{output_path}{rst}")
 
 def create_empty_reports(output_dir, report_type, message):
     """Create empty reports with a message"""
@@ -450,4 +451,4 @@ def create_empty_reports(output_dir, report_type, message):
     tree = ET.ElementTree(root)
     tree.write(xml_path, encoding='utf-8', xml_declaration=True)
     
-    print(f"⚠ Created empty {report_type} reports with message: {message}")
+    error(f"⚠ Created empty {report_type} reports with message: {message}")

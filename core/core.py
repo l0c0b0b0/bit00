@@ -49,15 +49,14 @@ async def start_run(module, args, targets):  # noqa: RUF029
         except KeyboardInterrupt:
             fail("Interrupted by user")
         
+    if not args.results:    
         if "osint" in args.module:
             osint_loader = ReportsLoader("osint")
             osint_loader.generate_reports()
         else:
             netscan_loader = ReportsLoader("netscan") 
             netscan_loader.generate_reports()
-        
-        #elapsed_time = self.calculate_elapsed_time(start_time)
-        #self.info('{bgreen}Finished all targets in {elapsed_time}!{rst}')
+
 
 def main() -> None:
     """Main entry point."""

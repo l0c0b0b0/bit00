@@ -3,10 +3,11 @@ import json
 import xml.etree.ElementTree as ET
 from collections import defaultdict
 import re
+from helpers.io import error, info, debug, warn
 
 def generate_reports(patterns_log_paths, output_dir):
     """Generate NETSCAN reports from multiple patterns.log files"""
-    print(f"Generating NETSCAN reports from {len(patterns_log_paths)} log files")
+    debug(f"Generating NETSCAN reports from {len(patterns_log_paths)} log files")
     
     parser = NetScanParser()
     
@@ -14,23 +15,23 @@ def generate_reports(patterns_log_paths, output_dir):
     all_netscan_data = defaultdict(lambda: defaultdict(list))
     
     for log_path in patterns_log_paths:
-        print(f"Processing NETSCAN log: {log_path}")
+        debug(f"Processing NETSCAN log: {log_path}")
         if not os.path.exists(log_path):
-            print(f"  ✗ Log file not found: {log_path}")
+            error(f"  ✗ Log file not found: {log_path}")
             continue
             
         file_size = os.path.getsize(log_path)
-        print(f"  ✓ Log file size: {file_size} bytes")
+        debug(f"  ✓ Log file size: {file_size} bytes")
         
         netscan_data = parser.parse_netscan_data(log_path)
         
         if not netscan_data:
-            print(f"  ⚠ No NETSCAN data found in: {log_path}")
+            error(f"  ⚠ No NETSCAN data found in: {log_path}")
             continue
             
         # Merge data from all logs
         for ip, data in netscan_data.items():
-            print(f"  Found IP: {ip} with {len(data.get('services', []))} services")
+            debug(f"  Found IP: {ip} with {len(data.get('services', []))} services")
             
             # Only update OS/TTL if not already set or if we have better info
             if 'os' not in all_netscan_data[ip] or all_netscan_data[ip]['os'] == 'Unknown':
@@ -44,10 +45,10 @@ def generate_reports(patterns_log_paths, output_dir):
             # Merge services
             all_netscan_data[ip]['services'].extend(data.get('services', []))
     
-    print(f"Total IPs found: {len(all_netscan_data)}")
+    info("Total IPs found: {byellow}{total_ips}{rst}", total_ips =len(all_netscan_data))
     
     if not all_netscan_data:
-        print("⚠ No NETSCAN data found in any log files!")
+        error("⚠ No NETSCAN data found in any log files!")
         # Create empty reports with message
         create_empty_reports(output_dir, "netscan", "No NETSCAN data found in log files")
         return
@@ -62,7 +63,7 @@ def generate_reports(patterns_log_paths, output_dir):
 
 def remove_duplicates(netscan_data):
     """Remove duplicate services from NETSCAN data"""
-    print("Removing duplicate services...")
+    debug("Removing duplicate services...")
     
     deduplicated_data = defaultdict(lambda: defaultdict(list))
     duplicate_count = 0
@@ -86,16 +87,16 @@ def remove_duplicates(netscan_data):
                 unique_services.append(service)
             else:
                 duplicate_count += 1
-                print(f"  Removed duplicate service for {ip}: {service_key}")
+                debug(f"  Removed duplicate service for {ip}: {service_key}")
         
         deduplicated_data[ip]['services'] = unique_services
         
         original_count = len(data.get('services', []))
         unique_count = len(unique_services)
         if original_count != unique_count:
-            print(f"  IP {ip}: {original_count} -> {unique_count} services (removed {original_count - unique_count} duplicates)")
+            debug(f"  IP {ip}: {original_count} -> {unique_count} services (removed {original_count - unique_count} duplicates)")
     
-    print(f"✓ Removed {duplicate_count} duplicate services total")
+    debug(f"✓ Removed {duplicate_count} duplicate services total")
     return deduplicated_data
 
 class NetScanParser:
@@ -115,7 +116,7 @@ class NetScanParser:
                     
                     # Debug: print first few lines to understand format
                     if line_num <= 3:
-                        print(f"    Line {line_num}: {line}")
+                        debug(f"    Line {line_num}: {line}")
                     
                     # Parse the actual log format: 
                     # [*] [20251107:22.48.40]:portscan:NmapTCPTop1000:200.87.125.227:portscan:tcp/143/imap-Dovecot imapd54
@@ -130,7 +131,7 @@ class NetScanParser:
                     match = re.match(pattern, line)
                     
                     if not match:
-                        print(f"    ✗ Line {line_num} doesn't match expected format")
+                        debug(f"    ✗ Line {line_num} doesn't match expected format")
                         continue
                     
                     # Extract components from regex groups
@@ -141,20 +142,20 @@ class NetScanParser:
                     context = match.group(5)    # "portscan" or "vuln" or "cve"
                     service_details = match.group(6) # "tcp/143/imap-Dovecot imapd54"
                     
-                    print(f"    Parsed - Phase: '{phase}', Plugin: '{plugin}', IP: '{ip_address}'")
+                    debug(f"    Parsed - Phase: '{phase}', Plugin: '{plugin}', IP: '{ip_address}'")
                     
                     # Only process NETSCAN phases
                     if phase == 'portscan':
                         netscan_entries += 1
                         self._process_netscan_entry(plugin, context, ip_address, service_details)
-                        print(f"    ✓ Processed NETSCAN entry #{netscan_entries}")
+                        debug(f"    ✓ Processed NETSCAN entry #{netscan_entries}")
                     else:
-                        print(f"    ✗ Skipping - not portscan phase: '{phase}'")
+                        debug(f"    ✗ Skipping - not portscan phase: '{phase}'")
             
-            print(f"  Processed {netscan_entries} NETSCAN entries")
+            debug(f"  Processed {netscan_entries} NETSCAN entries")
             
         except Exception as e:
-            print(f"  ✗ Error parsing log file: {e}")
+            error(f"  ✗ Error parsing log file: {e}")
             import traceback
             traceback.print_exc()
         
@@ -164,7 +165,7 @@ class NetScanParser:
         """Process a single NETSCAN entry"""
         # Validate IP address
         if not self._is_valid_ip(ip_address):
-            print(f"    Invalid IP: {ip_address}")
+            debug(f"    Invalid IP: {ip_address}")
             return
         
         # Extract TTL from service_details (look for numbers at the end)
@@ -185,7 +186,7 @@ class NetScanParser:
         
         self.netscan_data[ip_address]['services'].append((plugin, service_desc))
         
-        print(f"    Added service for {ip_address}: {plugin} - {service_desc} (TTL: {ttl}, OS: {os_type})")
+        debug(f"    Added service for {ip_address}: {plugin} - {service_desc} (TTL: {ttl}, OS: {os_type})")
 
     def _is_valid_ip(self, ip):
         """Check if the string is a valid IP address"""
@@ -246,7 +247,7 @@ def generate_netscan_markdown(netscan_data, output_dir):
     output_path = os.path.join(output_dir, "netscan.md")
     with open(output_path, 'w', encoding='utf-8') as f:
         f.write('\n'.join(content))
-    print(f"✓ NETSCAN Markdown report generated: {output_path}")
+    info("NETSCAN Markdown report generated: {bgreen}{output_path}{rst}")
 
 
 def generate_netscan_json(netscan_data, output_dir):
@@ -277,7 +278,7 @@ def generate_netscan_json(netscan_data, output_dir):
     output_path = os.path.join(output_dir, "netscan.json")
     with open(output_path, 'w', encoding='utf-8') as f:
         json.dump(report, f, indent=2, ensure_ascii=False)
-    print(f"✓ NETSCAN JSON report generated: {output_path}")
+    info("NETSCAN JSON report generated: {bgreen}{output_path}{rst}")
 
 def generate_netscan_xml(netscan_data, output_dir):
     """Generate NETSCAN XML report"""
@@ -301,7 +302,7 @@ def generate_netscan_xml(netscan_data, output_dir):
     output_path = os.path.join(output_dir, "netscan.xml")
     tree = ET.ElementTree(root)
     tree.write(output_path, encoding='utf-8', xml_declaration=True)
-    print(f"✓ NETSCAN XML report generated: {output_path}")
+    info("NETSCAN XML report generated: {bgreen}{output_path}{rst}")
 
 def create_empty_reports(output_dir, report_type, message):
     """Create empty reports with a message"""
@@ -322,4 +323,4 @@ def create_empty_reports(output_dir, report_type, message):
     tree = ET.ElementTree(root)
     tree.write(xml_path, encoding='utf-8', xml_declaration=True)
     
-    print(f"⚠ Created empty {report_type} reports with message: {message}")
+    warn(f"⚠ Created empty {report_type} reports with message: {message}")

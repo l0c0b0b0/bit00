@@ -1,6 +1,6 @@
 # BIT00
 
-BIT00 is a multi-threaded reconnaissance tool which performs automated enumeration of osint, subdomains, ports, emails and vulnerabilities. It is intended as a time-saving tool on penetration testing.
+BIT00 is a multi-threaded reconnaissance tool which performs automated enumeration of osint, subdomains and ports. It is intended as a time-saving tool on penetration testing.
 
 The tool is splited into different modules, like OSINT - NETSCAN. Future work will be implemented LDAP for internal enumeration.
 
@@ -8,7 +8,8 @@ The tool works by firstly performing reconnaissance face before testing each hos
 
 Everything in the tool is highly configurable. The author will not be held responsible for negative actions that result from the mis-use of this tool.
 
-**Disclaimer: While BIT00 endeavors to perform as much identification and enumeration of services as possible, there is no guarantee that every service will be identified, or that every service will be fully enumerated.**
+> [!Disclaimer]
+> While BIT00 endeavors to perform as much identification and enumeration of services as possible, there is no guarantee that every service will be > identified, or that every service will be fully enumerated.
 
 ## Installation
 
@@ -19,20 +20,23 @@ BIT00 is a manually installation. Before installation using any of these methods
 sudo apt update
 ```
 
-### Python3 
+### Python3
 
-BIT00 requires the usage of Python3.8+ and pip, which can be installed on Kali Linux using the following commands:
+BIT00 requires the usage of Python3.13 and pip, which can be installed on Kali Linux using the following commands:
+***possible to install on any linux if the tools are installed also***
 
 ```bash
 sudo apt install python3
 sudo apt install python3-pip
 sudo apt install python3-venv
 ```
-### Installation Method: Manually
+
+### Installation Method (Manually)
 Install and execute `bit00.py` from within the RECON directory, install the dependencies:
+**Not recommended***
 
 ```bash
-(root) pip install -r requirements.txt
+(root) pip install -r requirements.txt --break-system-packages 
 ```
 
 You can also create a VirtualEnviroment with python3 if you don't want to install on your OS the packages:
@@ -43,7 +47,7 @@ You can also create a VirtualEnviroment with python3 if you don't want to instal
 (root) pip install -r requirements.txt
 ```
 
-To exit the virtual enviromment:
+Exit the virtual enviromment:
 
 ```bash
 (root) (bit00) deactivate
@@ -56,6 +60,7 @@ BIT00 uses Python 3 specific functionality and does not support Python 2.
 * OSINT MODULE
 
 ```
+
 usage: bit00.py osint [-h] [-ct <number>] [-cs <number>] [-V] [-o OUTPUTDIR] [-oor] [-L] [-P PLUGIN] [-v] [--only-scans-dir] [targets ...]
 
 Perform OSINT reconnaissance to a domain
@@ -84,6 +89,7 @@ options:
 * NETSCAN MODULE
 
 ```
+
 usage: bit00.py netscan [-h] [-ct <number>] [-cs <number>] [-V] [-ops] [-p PROFILE] [-L] [-P PLUGIN] [-v] [-o OUTPUTDIR] [--only-scans-dir] [targets ...]
 
 Network reconnaissance tool to port scan and automatically enumerate services on multiple targets.
@@ -140,12 +146,19 @@ Several commands used in BIT00 may need to be installed, deppending on your OS:
 |                 | netexec |
 
 
-On Kali Linux, you can ensure these are all installed using the following commands:
+On Kali Linux, you can ensure all the tools are installed using the following commands:
+
+* OSINT MODULE
 
 ```bash
-sudo apt install seclists curl dnsrecon enum4linux feroxbuster gobuster impacket-scripts nbtscan nmap redis-tools smbclient smbmap snmp sslscan sipvicious whatweb cmseek nuclei netexec spiderfoot dnsrecon fierce cloud_enum asn metagoofil dnsutils
+sudo apt install spiderfoot dnsrecon fierce cloud_enum asn metagoofil dnsutils
 ```
 
+* NETSCAN MODULE
+
+```bash
+sudo apt install seclists curl dnsrecon enum4linux feroxbuster gobuster impacket-scripts nbtscan nmap redis-tools smbclient smbmap snmp sslscan sipvicious whatweb cmseek nuclei netexec
+```
 
 ### Verbosity
 
@@ -160,12 +173,9 @@ BIT00 supports four levels of verbosity:
 
 ```
 
-├── netscan.json
-├── netscan.md
-├── netscan.xml
-├── osint.json
-├── osint.xml
-├── osint.md
+├── rsults.json
+├── rsults.md
+├── results.xml
 ├── osint
 │   └── patito.com
 │       ├── logs
@@ -173,134 +183,28 @@ BIT00 supports four levels of verbosity:
 │       │   ├── error.log
 │       │   └── patterns.log
 │       └── scans
-│           ├── info
-│           │   ├── email_spiderfoot_agetic.gob.bo.ansi
-│           │   ├── email_spiderfoot_ns.agetic.gob.bo.ansi
-│           │   ├── email_spiderfoot_www.agetic.gob.bo.ansi
-│           │   ├── geolocation_ipapi_186.121.242.37.json
-│           │   ├── geolocation_ipapi_186.121.242.44.json
-│           │   ├── geolocation_ipapi_186.121.242.45.json
-│           │   ├── geolocation_ipapi_190.14.106.3.json
-│           │   ├── geolocation_ipapi_190.14.106.6.json
-│           │   ├── geolocation_ipapi_200.87.125.227.json
-│           │   ├── geolocation_ipapi_200.87.125.234.json
-│           │   └── geolocation_ipapi_agetic.gob.bo.json
+│           ├── infon
 │           ├── recon
-│           │   ├── dns_fierce_agetic.gob.bo.ansi
-│           │   ├── revdns_dig_agetic.gob.bo.ansi
-│           │   ├── revdns_dnsrecon_190.14.106.3.csv
-│           │   ├── revdns_dnsrecon_200.87.125.227.csv
-│           │   ├── revdns_dnsrecon_agetic.gob.bo.csv
-│           │   └── sublist3r_agetic.gob.bo.txt
 │           └── tech
-│               ├── net_asn_186.121.242.37.json
-│               ├── net_asn_186.121.242.44.json
-│               ├── net_asn_186.121.242.45.json
-│               ├── net_asn_190.14.106.3.json
-│               ├── net_asn_190.14.106.6.json
-│               ├── net_asn_200.87.125.227.json
-│               ├── net_asn_200.87.125.234.json
-│               ├── web_spiderfoot_agetic.gob.bo.ansi
-│               ├── web_spiderfoot_blog.agetic.gob.bo.ansi
-│               ├── web_spiderfoot_capibara.agetic.gob.bo.ansi
-│               ├── web_spiderfoot_test.agetic.gob.bo.ansi
-│               └── web_spiderfoot_www.agetic.gob.bo.ansi
-
-├── recon
-│   ├── 190.181.15.42
-│   │   ├── logs
-│   │   │   ├── commands.log
-│   │   │   └── error.log
-│   │   └── scans
-│   │       ├── gnmap
-│   │       │   └── _top_1000_tcp_nmap.gnmap
-│   │       ├── searchsploit-nmap-tcp.ansi
-│   │       ├── _top_1000_tcp_masscan.txt
-│   │       ├── _top_1000_tcp_nmap.txt
-│   │       └── xml
-│   │           └── _top_1000_tcp_nmap.xml
-│   ├── 190.181.15.45
-│   │   ├── logs
-│   │   │   ├── commands.log
-│   │   │   ├── error.log
-│   │   │   └── patterns.log
-│   │   └── scans
-│   │       ├── gnmap
-│   │       │   └── _top_1000_tcp_nmap.gnmap
-│   │       ├── searchsploit-nmap-tcp.ansi
-│   │       ├── _top_1000_tcp_masscan.txt
-│   │       ├── _top_1000_tcp_nmap.txt
-│   │       └── xml
-│   │           └── _top_1000_tcp_nmap.xml
-│   ├── 200.87.125.227
-│   │   ├── logs
-│   │   │   ├── commands.log
-│   │   │   ├── error.log
-│   │   │   └── patterns.log
-│   │   └── scans
-│   │       ├── _full_tcp_nmap.txt
-│   │       ├── gnmap
-│   │       │   ├── _full_tcp_nmap.gnmap
-│   │       │   └── _top_1000_tcp_nmap.gnmap
-│   │       ├── searchsploit-nmap-tcp.ansi
-│   │       ├── tcp_143_imap_nmap.txt
-│   │       ├── tcp_25_cassandra_nmap.txt
-│   │       ├── tcp_25_distcc_nmap.txt
-│   │       ├── tcp_587_sslscan.txt
-│   │       ├── tcp_636_ldap_nmap.txt
-│   │       ├── tcp_636_ldapssl_ldapanonymous.ansi
-│   │       ├── tcp_636_ldapssl_ldapsearch.ansi
-│   │       ├── tcp_636_ldapssl_netexec_notsigned.ansi
-│   │       ├── tcp_636_sslscan.txt
-│   │       ├── tcp_80_http_CMSeek.ansi
-│   │       ├── tcp_80_sslscan.txt
-│   │       ├── tcp_993_imap_nmap.txt
-│   │       ├── tcp_993_irc_nmap.txt
-│   │       ├── _top_1000_tcp_masscan.txt
-│   │       ├── _top_1000_tcp_nmap.txt
-│   │       └── xml
-│   │           ├── _full_tcp_nmap.xml
-│   │           └── _top_1000_tcp_nmap.xml
-│   └── 200.87.125.234
-│       ├── logs
-│       │   ├── commands.log
-│       │   ├── error.log
-│       │   └── patterns.log
-│       └── scans
-│           ├── _full_tcp_nmap.txt
-│           ├── gnmap
-│           │   ├── _full_tcp_nmap.gnmap
-│           │   └── _top_1000_tcp_nmap.gnmap
-│           ├── searchsploit-nmap-tcp.ansi
-│           ├── tcp_443_http_nmap.txt
-│           ├── tcp_443_snmp_nmap.txt
-│           ├── tcp_443_sslscan.txt
-│           ├── tcp_80_cassandra_nmap.txt
-│           ├── tcp_80_distcc_nmap.txt
-│           ├── tcp_80_http_nmap.txt
-│           ├── tcp_80_http_nuclei.txt
-│           ├── _top_1000_tcp_masscan.txt
-│           ├── _top_1000_tcp_nmap.txt
-│           └── xml
-│               ├── _full_tcp_nmap.xml
-│               ├── tcp_443_https_nmap.xml
-│               └── _top_1000_tcp_nmap.xml
-
-
+└── recon
+    └── 10.11.10.10
+        ├── logs
+        │   ├── commands.log
+        │   ├── error.log
+        │   └── patterns.log
+        └── scans
+            ├── gnmap
+            └── xml
 
 ```
 
 The logs directory is where all masscan/nmap scans data will save. This information is only for the port-scan-profiles.toml's commands:
 
-* \_commands.log contains a list of every command BIT00 ran against the target. This is useful if one of the commands fails and you want to run it again with modifications.
+* \commands.log contains a list of every command BIT00 ran against the target. This is useful if one of the commands fails and you want to run it again with modifications.
 
-* If output matches a defined pattern, two files called \_sumportsrv.log and \_draft.log will also appear in the scans directory with details about the matched output.
+* If output matches of a defined pattern, will be log in the \patterns.log file.
 
-* If a scan results in an error, a file called \_errors.log will also appear in the logs directory with some details to alert the user.
-
-Scans directory:
-
-* \_manual_commands.txt contains any commands that are deemed "too dangerous" to run automatically, either because they are too intrusive, require modification based on human analysis, or just work better when there is a human monitoring them.
+* If a scan results in an error, a file called \errors.log will also appear in the logs directory with some details to alert the user.
 
 > [!NOTE]
 > BIT00 does NOT make any exploit o execute any PoC, its only reconnaissance!!!

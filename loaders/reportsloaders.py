@@ -3,6 +3,7 @@ import sys
 import importlib.util
 from pathlib import Path
 import glob
+from helpers.io import info, error, warn, debug
 
 class ReportsLoader:
     def __init__(self, module_name):
@@ -36,8 +37,8 @@ class ReportsLoader:
 
     def discover_patterns_logs(self):
         """Discover all patterns.log files for the given module"""
-        print(f"Current working directory: {self.current_dir}")
-        print(f"Project root directory: {self.root_dir}")
+        info(f"Current working directory: {self.current_dir}")
+        #info(f"Project root directory: {self.root_dir}")
         
         # Look for logs in CURRENT WORKING DIRECTORY (where user runs the program)
         if self.module_name == "osint":
@@ -45,7 +46,7 @@ class ReportsLoader:
         else:  # netscan
             search_pattern = os.path.join(self.current_dir, "recon", "*", "logs", "patterns.log")
         
-        print(f"Searching for logs with pattern: {search_pattern}")
+        info(f"Searching for logs with pattern: {search_pattern}")
         
         self.patterns_logs = glob.glob(search_pattern)
         
@@ -56,40 +57,40 @@ class ReportsLoader:
             base_dir = os.path.join(self.current_dir, "recon")
             
         if os.path.exists(base_dir):
-            print(f"✓ Base directory exists: {base_dir}")
+            debug(f"✓ Base directory exists: {base_dir}")
             # List targets in the base directory
             targets = [d for d in os.listdir(base_dir) if os.path.isdir(os.path.join(base_dir, d))]
-            print(f"  Found targets: {targets}")
+            debug(f"  Found targets: {targets}")
             
             # Check each target for logs
             for target in targets:
                 logs_dir = os.path.join(base_dir, target, "logs")
                 patterns_file = os.path.join(logs_dir, "patterns.log")
                 if os.path.exists(patterns_file):
-                    print(f"  ✓ Found patterns.log for {target}: {patterns_file}")
+                    debug(f"  ✓ Found patterns.log for {target}: {patterns_file}")
                 else:
-                    print(f"  ✗ No patterns.log for {target} (logs dir exists: {os.path.exists(logs_dir)})")
+                    debug(f"  ✗ No patterns.log for {target} (logs dir exists: {os.path.exists(logs_dir)})")
         else:
-            print(f"✗ Base directory not found: {base_dir}")
-            print(f"  Current directory contents: {os.listdir(self.current_dir)}")
+            error(f"✗ Base directory not found: {base_dir}")
+            error(f"  Current directory contents: {os.listdir(self.current_dir)}")
         
-        print(f"Found {len(self.patterns_logs)} patterns.log files for {self.module_name}:")
+        debug(f"Found {len(self.patterns_logs)} patterns.log files for {self.module_name}:")
         for log in self.patterns_logs:
-            print(f"  - {log}")
+            debug(f"  - {log}")
         
         return self.patterns_logs
 
     def discover_patterns_logs_from_dir(self, search_dir):
         """Discover all patterns.log files from a specific directory"""
-        print(f"Searching for patterns.log files in: {search_dir}")
+        debug(f"Searching for patterns.log files in: {search_dir}")
         
         # Look for patterns.log files recursively in the given directory
         search_pattern = os.path.join(search_dir, "**", "patterns.log")
         self.patterns_logs = glob.glob(search_pattern, recursive=True)
         
-        print(f"Found {len(self.patterns_logs)} patterns.log files in {search_dir}:")
+        debug(f"Found {len(self.patterns_logs)} patterns.log files in {search_dir}:")
         for log in self.patterns_logs:
-            print(f"  - {log}")
+            debug(f"  - {log}")
         
         return self.patterns_logs
 
@@ -97,13 +98,13 @@ class ReportsLoader:
         """Load and execute the report.py for the specific module"""
         module_path = os.path.join(self.modules_dir, self.module_name, "report.py")
         
-        print(f"Looking for module at: {module_path}")
+        debug(f"Looking for module at: {module_path}")
         
         if not os.path.exists(module_path):
-            print(f"Report module not found: {module_path}")
+            error(f"Report module not found: {module_path}")
             return False
         
-        print(f"Found report module at: {module_path}")
+        debug(f"Found report module at: {module_path}")
         
         try:
             # Dynamically import the module
@@ -119,41 +120,42 @@ class ReportsLoader:
                 
                 # Pass all discovered patterns logs to the module
                 module.generate_reports(self.patterns_logs, self.reports_dir)
-                print(f"✓ Successfully generated reports for {self.module_name}")
+                info("Successfully generated reports for {bgreen}{self.module_name}{rst}")
                 return True
             else:
-                print(f"✗ Module {self.module_name} doesn't have generate_reports function")
+                error(f"✗ Module {self.module_name} doesn't have generate_reports function")
                 return False
                 
         except Exception as e:
-            print(f"✗ Error loading module {self.module_name}: {str(e)}")
+            error(f"✗ Error loading module {self.module_name}: {str(e)}")
             import traceback
             traceback.print_exc()
             return False
 
     def generate_reports(self):
         """Generate reports for the specific module"""
-        print(f"\n{'='*50}")
-        print(f"Generating reports for: {self.module_name.upper()}")
-        print(f"{'='*50}")
+        mu=self.module_name.upper()
+        info("{bgreen}{mysc}{rst}", mysc='='*50)
+        info("Generating reports for:{bgreen}{mu}{rst}")
+        info("{bgreen}{mysc}{rst}", mysc='='*50)
         
         # First discover all patterns.log files
         logs_found = self.discover_patterns_logs()
         
         if not logs_found:
-            print(f"✗ No patterns.log files found for {self.module_name}")
-            print(f"Please make sure you have run scans first.")
-            print(f"Expected location: {self.current_dir}/{self.module_name}/*/logs/patterns.log")
+            error(f"✗ No patterns.log files found for {self.module_name}")
+            error(f"Please make sure you have run scans first.")
+            error(f"Expected location: {self.current_dir}/{self.module_name}/*/logs/patterns.log")
             return False
         
         # Then load and execute the module's report generator
         success = self.load_module_report()
         
         if success:
-            print(f"✓ Completed {self.module_name.upper()} report generation")
-            print(f"Reports saved to: {self.reports_dir}/")
+            info("✓ Completed {bgreen}{mu}{rst} report generation")
+            info("Reports saved to: {bblue}{_dir}/{rst}", _dir=self.reports_dir)
         else:
-            print(f"✗ Failed to generate {self.module_name.upper()} reports")
+            error(f"✗ Failed to generate {self.module_name.upper()} reports")
             
         return success
 
@@ -164,34 +166,36 @@ class ReportsLoader:
             search_dir (str): Directory to search for patterns.log files
             output_dir (str, optional): Directory to save reports. If None, uses default reports directory
         """
-        print(f"\n{'='*50}")
-        print(f"Generating {self.module_name.upper()} reports from directory: {search_dir}")
-        print(f"{'='*50}")
+        mu=self.module_name.upper()
+        ddir = search_dir
+        info("{bgreen}{mysc}{rst}", mysc='='*50)
+        info("Generating {bgreen}{mu}{rst} reports from directory: {bgreen}{ddir}{rst}")
+        info("{bgreen}{mysc}{rst}", mysc='='*50)
         
         # Validate the search directory
         if not os.path.exists(search_dir):
-            print(f"✗ Search directory not found: {search_dir}")
+            error(f"✗ Search directory not found: {search_dir}")
             return False
         
         # Set custom output directory if provided
         if output_dir:
             self.reports_dir = output_dir
-            print(f"Using custom output directory: {output_dir}")
+            #debug(f"Using custom output directory: {output_dir}")
         
         # Discover patterns.log files from the specified directory
         logs_found = self.discover_patterns_logs_from_dir(search_dir)
         
         if not logs_found:
-            print(f"✗ No patterns.log files found in: {search_dir}")
+            error(f"✗ No patterns.log files found in: {search_dir}")
             return False
         
         # Load and execute the module's report generator
         success = self.load_module_report()
         
         if success:
-            print(f"✓ Completed {self.module_name.upper()} report generation")
-            print(f"Reports saved to: {self.reports_dir}/")
+            info("Completed {bgreen}{mu}{rst} report generation")
+            info("Reports saved to: {bblue}{re_dir}{rst}/", re_dir=self.reports_dir)
         else:
-            print(f"✗ Failed to generate {self.module_name.upper()} reports")
+            error(f"✗ Failed to generate {self.module_name.upper()} reports")
             
         return success
