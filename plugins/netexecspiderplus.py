@@ -10,7 +10,7 @@ class NetexecSpiderplus:
     description: str = "smb scanning with netexec-spiderplus"
     tag: List[str] = field(default_factory=lambda: ["scans", "NetexecSpiderplus"])
     supported_modules: List[str] = field(default_factory=lambda: ["netscan"])
-    services_matches: Tuple[str, ...] = field(default=('^smb', '^microsoft\-ds', '^netbios'))
+    services_matches: Tuple[str, ...] = field(default=('^smb', '^microsoft-ds', '^netbios'))
     run_once: bool = False
         
    
