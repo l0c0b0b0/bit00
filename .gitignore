@@ -4,3 +4,10 @@ __pycache__/
 
 # VS Code settings
 .vscode/
+
+# Toml Configuration
+*.toml
+
+# UV lock Configuration file
+*.lock
+
