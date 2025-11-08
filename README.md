@@ -56,7 +56,7 @@ BIT00 uses Python 3 specific functionality and does not support Python 2.
 * OSINT MODULE
 
 ```
-usage: bit00.py osint [-h] [-v] [-ct <number>] [-cs <number>] [--disable-sanity-checks] [-t TARGET_FILE] [-o OUTPUT_DIR] [--only-scans-dir] [targets ...]
+usage: bit00.py osint [-h] [-ct <number>] [-cs <number>] [-V] [-o OUTPUTDIR] [-oor] [-L] [-P PLUGIN] [-v] [--only-scans-dir] [targets ...]
 
 Perform OSINT reconnaissance to a domain
 
@@ -65,24 +65,26 @@ positional arguments:
 
 options:
   -h, --help            show this help message and exit
-  -v, --verbose         Enable verbose output. Repeat for more verbosity.
   -ct, --concurrent-targets <number>
                         The maximum number of target hosts to scan concurrently. Default: 5
   -cs, --concurrent-scans <number>
                         The maximum number of scans to perform per target host. Default: 10
-  --disable-sanity-checks
-                        Disable sanity checks for large target ranges
-  -t, --targets TARGET_FILE
-                        Read targets from file
-  -o, --output OUTPUT_DIR
+  -V, --version         Display version information and exit
+  -o, --output OUTPUTDIR
                         The output directory for results. Default: osint
+  -oor, --only-osint-recon
+                        Only reconnaissance phase the "scans" tools will NOT be running.
+  -L, --list-plugins    List all available OSINT plugins
+  -P, --plugin PLUGIN   Run specific plugin instead of full scan
+  -v, --verbose         Enable verbose output. Repeat for more verbosity.
   --only-scans-dir      Only create the "scans" directory for results.
+
 ```
 
 * NETSCAN MODULE
 
 ```
-usage: bit00.py netscan [-h] [-v] [-ct <number>] [-cs <number>] [--disable-sanity-checks] [-t TARGET_FILE] [--only-portscan] [--profile PROFILE] [-o OUTPUT_DIR] [--only-scans-dir] [--nmap NMAP | --nmap-append NMAP_APPEND] [targets ...]
+usage: bit00.py netscan [-h] [-ct <number>] [-cs <number>] [-V] [-ops] [-p PROFILE] [-L] [-P PLUGIN] [-v] [-o OUTPUTDIR] [--only-scans-dir] [targets ...]
 
 Network reconnaissance tool to port scan and automatically enumerate services on multiple targets.
 
@@ -91,23 +93,21 @@ positional arguments:
 
 options:
   -h, --help            show this help message and exit
-  -v, --verbose         Enable verbose output. Repeat for more verbosity.
   -ct, --concurrent-targets <number>
                         The maximum number of target hosts to scan concurrently. Default: 5
   -cs, --concurrent-scans <number>
                         The maximum number of scans to perform per target host. Default: 10
-  --disable-sanity-checks
-                        Disable sanity checks for large target ranges
-  -t, --targets TARGET_FILE
-                        Read targets from a file.
-  --only-portscan       Only scan open ports and ips, enumeration services will NOT run. Default: False
-  --profile PROFILE     The port scanning profile the intensity of the scan there are 3 modes: default => TOP1000, full => 65535, redteam => TOP100. Default: default
-  -o, --output OUTPUT_DIR
+  -V, --version         Display version information and exit
+  -ops, --only-portscan
+                        Only scan open ports and ips, enumeration services will NOT run. Default: False
+  -p, --profile PROFILE
+                        The port scanning profiles: default(TCP TOP1000),full(TCP 65535). Ex.bit00.py netscan <ipaddress> -p full Default: default
+  -L, --list-plugins    List all available OSINT plugins
+  -P, --plugin PLUGIN   Run specific plugin instead of full scan
+  -v, --verbose         Enable verbose output. Repeat for more verbosity.
+  -o, --output OUTPUTDIR
                         The output directory for results. Default: recon
-  --only-scans-dir      Only create the "scans" directory for results. Other directories (e.g. logs, scan) will not be created. Default: false
-  --nmap NMAP           Override the {nmap_extra} variable in scans. Default: -vv -Pn
-  --nmap-append NMAP_APPEND
-                        Append to the default {nmap_extra} variable in scans.
+  --only-scans-dir      Only create the "scans" directory for results. Other directories (e.g. exploit, loot, report) will not be created. Default: false
 ```
 
 ### Supporting Packages
@@ -160,74 +160,132 @@ BIT00 supports four levels of verbosity:
 
 ```
 
-/osint
-└── target.com
-    ├── logs
-    │   ├── _commands.log
-    │   ├── _domainip.csv
-    │   └── _patterns.log
-    └── scans
-        ├── info
-        │   ├── cloud_cloudenum_target.com.csv
-        │   ├── dataleak_metagoofil_target.com.txt
-        │   ├── email_spiderfoot_target.com.ansi
-        │   ├── geolocation_ipapi_10.10.10.10.json
-        │   ├── geolocation_ipapi_10.10.10.11.json
-        │   └── metadata_metagoogil.ansi
-        ├── _manual_commands.txt
-        ├── recon
-        │   ├── cloud_cloudenum_target.com.ansi
-        │   ├── cloud_spiderfoot_target.com.ansi
-        │   ├── dns_dnsrecon_target.com.json
-        │   ├── dns_fierce_target.com.ansi
-        │   ├── dns_host_target.com.ansi
-        │   ├── dns_sublist3r_target.com.txt
-        │   ├── revdns_dig_target.com.ansi
-        │   ├── revdns_dnsrecon_target.com.csv
-        │   └── subdomains_sublist3r_target.com.txt
-        └── tech
-            ├── net_asn_10.10.10.10.json
-            ├── net_asn_10.10.10.11.json
-            ├── web_spiderfoot_target.com.ansi
-            ├── web_spiderfoot_www.target.com.ansi
-            ├── web_spiderfoot_capibara.target.com.ansi
-            └── web_spiderfoot_plantillas-gobbo-drupal.demo.target.com.ansi
+├── netscan.json
+├── netscan.md
+├── netscan.xml
+├── osint.json
+├── osint.xml
+├── osint.md
+├── osint
+│   └── agetic.gob.bo
+│       ├── logs
+│       │   ├── commands.log
+│       │   ├── error.log
+│       │   └── patterns.log
+│       └── scans
+│           ├── info
+│           │   ├── email_spiderfoot_agetic.gob.bo.ansi
+│           │   ├── email_spiderfoot_ns.agetic.gob.bo.ansi
+│           │   ├── email_spiderfoot_www.agetic.gob.bo.ansi
+│           │   ├── geolocation_ipapi_186.121.242.37.json
+│           │   ├── geolocation_ipapi_186.121.242.44.json
+│           │   ├── geolocation_ipapi_186.121.242.45.json
+│           │   ├── geolocation_ipapi_190.14.106.3.json
+│           │   ├── geolocation_ipapi_190.14.106.6.json
+│           │   ├── geolocation_ipapi_200.87.125.227.json
+│           │   ├── geolocation_ipapi_200.87.125.234.json
+│           │   └── geolocation_ipapi_agetic.gob.bo.json
+│           ├── recon
+│           │   ├── dns_fierce_agetic.gob.bo.ansi
+│           │   ├── revdns_dig_agetic.gob.bo.ansi
+│           │   ├── revdns_dnsrecon_190.14.106.3.csv
+│           │   ├── revdns_dnsrecon_200.87.125.227.csv
+│           │   ├── revdns_dnsrecon_agetic.gob.bo.csv
+│           │   └── sublist3r_agetic.gob.bo.txt
+│           └── tech
+│               ├── net_asn_186.121.242.37.json
+│               ├── net_asn_186.121.242.44.json
+│               ├── net_asn_186.121.242.45.json
+│               ├── net_asn_190.14.106.3.json
+│               ├── net_asn_190.14.106.6.json
+│               ├── net_asn_200.87.125.227.json
+│               ├── net_asn_200.87.125.234.json
+│               ├── web_spiderfoot_agetic.gob.bo.ansi
+│               ├── web_spiderfoot_blog.agetic.gob.bo.ansi
+│               ├── web_spiderfoot_capibara.agetic.gob.bo.ansi
+│               ├── web_spiderfoot_test.agetic.gob.bo.ansi
+│               └── web_spiderfoot_www.agetic.gob.bo.ansi
 
+├── recon
+│   ├── 190.181.15.42
+│   │   ├── logs
+│   │   │   ├── commands.log
+│   │   │   └── error.log
+│   │   └── scans
+│   │       ├── gnmap
+│   │       │   └── _top_1000_tcp_nmap.gnmap
+│   │       ├── searchsploit-nmap-tcp.ansi
+│   │       ├── _top_1000_tcp_masscan.txt
+│   │       ├── _top_1000_tcp_nmap.txt
+│   │       └── xml
+│   │           └── _top_1000_tcp_nmap.xml
+│   ├── 190.181.15.45
+│   │   ├── logs
+│   │   │   ├── commands.log
+│   │   │   ├── error.log
+│   │   │   └── patterns.log
+│   │   └── scans
+│   │       ├── gnmap
+│   │       │   └── _top_1000_tcp_nmap.gnmap
+│   │       ├── searchsploit-nmap-tcp.ansi
+│   │       ├── _top_1000_tcp_masscan.txt
+│   │       ├── _top_1000_tcp_nmap.txt
+│   │       └── xml
+│   │           └── _top_1000_tcp_nmap.xml
+│   ├── 200.87.125.227
+│   │   ├── logs
+│   │   │   ├── commands.log
+│   │   │   ├── error.log
+│   │   │   └── patterns.log
+│   │   └── scans
+│   │       ├── _full_tcp_nmap.txt
+│   │       ├── gnmap
+│   │       │   ├── _full_tcp_nmap.gnmap
+│   │       │   └── _top_1000_tcp_nmap.gnmap
+│   │       ├── searchsploit-nmap-tcp.ansi
+│   │       ├── tcp_143_imap_nmap.txt
+│   │       ├── tcp_25_cassandra_nmap.txt
+│   │       ├── tcp_25_distcc_nmap.txt
+│   │       ├── tcp_587_sslscan.txt
+│   │       ├── tcp_636_ldap_nmap.txt
+│   │       ├── tcp_636_ldapssl_ldapanonymous.ansi
+│   │       ├── tcp_636_ldapssl_ldapsearch.ansi
+│   │       ├── tcp_636_ldapssl_netexec_notsigned.ansi
+│   │       ├── tcp_636_sslscan.txt
+│   │       ├── tcp_80_http_CMSeek.ansi
+│   │       ├── tcp_80_sslscan.txt
+│   │       ├── tcp_993_imap_nmap.txt
+│   │       ├── tcp_993_irc_nmap.txt
+│   │       ├── _top_1000_tcp_masscan.txt
+│   │       ├── _top_1000_tcp_nmap.txt
+│   │       └── xml
+│   │           ├── _full_tcp_nmap.xml
+│   │           └── _top_1000_tcp_nmap.xml
+│   └── 200.87.125.234
+│       ├── logs
+│       │   ├── commands.log
+│       │   ├── error.log
+│       │   └── patterns.log
+│       └── scans
+│           ├── _full_tcp_nmap.txt
+│           ├── gnmap
+│           │   ├── _full_tcp_nmap.gnmap
+│           │   └── _top_1000_tcp_nmap.gnmap
+│           ├── searchsploit-nmap-tcp.ansi
+│           ├── tcp_443_http_nmap.txt
+│           ├── tcp_443_snmp_nmap.txt
+│           ├── tcp_443_sslscan.txt
+│           ├── tcp_80_cassandra_nmap.txt
+│           ├── tcp_80_distcc_nmap.txt
+│           ├── tcp_80_http_nmap.txt
+│           ├── tcp_80_http_nuclei.txt
+│           ├── _top_1000_tcp_masscan.txt
+│           ├── _top_1000_tcp_nmap.txt
+│           └── xml
+│               ├── _full_tcp_nmap.xml
+│               ├── tcp_443_https_nmap.xml
+│               └── _top_1000_tcp_nmap.xml
 
-./recon
-├── 10.10.10.10
-│   ├── logs
-│   │   ├── _commands.log
-│   │   ├── _draft.log
-│   │   └── _sumportsrv.log
-│   └── scans
-│       ├── gnmap
-│       │   └── _top_1000_tcp_nmap.gnmap
-│       ├── searchsploit-nmap-tcp.ansi
-│       ├── _top_1000_tcp_nmap.txt
-│       └── xml
-│           └── _top_1000_tcp_nmap.xml
-└── 10.10.10.11
-    ├── logs
-    │   ├── _commands.log
-    │   ├── _draft.log
-    │   └── _sumportsrv.log
-    └── scans
-        ├── gnmap
-        │   └── _top_1000_tcp_nmap.gnmap
-        ├── _manual_commands.txt
-        ├── searchsploit-nmap-tcp.ansi
-        ├── tcp_443_sslscan.txt
-        ├── tcp_80_http_CMSeek.ansi
-        ├── tcp_80_http_feroxbuster.txt
-        ├── tcp_80_http_nmap.txt
-        ├── tcp_80_http_nuclei.txt
-        ├── tcp_80_http_robots.txt
-        ├── tcp_80_http_whatweb.ansi
-        ├── _top_1000_tcp_nmap.txt
-        └── xml
-            ├── tcp_80_http_nmap.xml
-            └── _top_1000_tcp_nmap.xml
 
 
 ```
