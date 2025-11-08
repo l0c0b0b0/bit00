@@ -14,6 +14,7 @@ def mod_args(subparsers: argparse._SubParsersAction, parents: list) -> argparse.
     netscan_parser.add_argument('-v', '--verbose', action='count', default=0,
                                 help='Enable verbose output. Repeat for more verbosity.')
     netscan_parser.add_argument('-o', '--output', action='store', default='recon', dest='outputdir', help='The output directory for results. Default: %(default)s')
+    netscan_parser.add_argument('-r', '--results', action='store', default='recon', dest='results', help='Create the report in MarkDown, Json and Xml. Default: It will execute after finish all targets')
     netscan_parser.add_argument('--only-scans-dir', action='store_true', default=False, help='Only create the "scans" directory for results. Other directories (e.g. exploit, loot, report) will not be created. Default: false')
 
     return subparsers

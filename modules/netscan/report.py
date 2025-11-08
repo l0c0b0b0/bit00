@@ -1,330 +1,325 @@
-import re
+import os
 import json
 import xml.etree.ElementTree as ET
 from collections import defaultdict
-from datetime import datetime
+import re
 
-def detect_os_from_ttl(ttl):
-    """
-    Detect operating system based on TTL value
-    TTL < 64: Linux/Unix
-    TTL >= 64: Windows
-    """
-    try:
-        ttl_value = int(ttl)
-        if ttl_value < 64:
-            return "Linux"
-        else:
-            return "Windows"
-    except (ValueError, TypeError):
-        return "Unknown"
-
-def parse_log_file(log_content):
-    """
-    Parse the log file and extract structured data
-    """
-    hosts = defaultdict(lambda: {
-        'ttl': None,
-        'os': 'Unknown',
-        'plugins': defaultdict(dict)
-    })
+def generate_reports(patterns_log_paths, output_dir):
+    """Generate NETSCAN reports from multiple patterns.log files"""
+    print(f"Generating NETSCAN reports from {len(patterns_log_paths)} log files")
     
-    lines = log_content.strip().split('\n')
+    parser = NetScanParser()
     
-    for line in lines:
-        # Extract basic components
-        timestamp_match = re.search(r'\[(\d+:\d+\.\d+\.\d+)\]', line)
-        event_type_match = re.search(r':(\w+):', line)
-        plugin_match = re.search(r':([^:]+):([^:]+):', line)
-        ip_match = re.search(r'(\d+\.\d+\.\d+\.\d+)', line)
-        
-        if not all([timestamp_match, event_type_match, plugin_match, ip_match]):
+    # Parse data from all log files
+    all_netscan_data = defaultdict(lambda: defaultdict(list))
+    
+    for log_path in patterns_log_paths:
+        print(f"Processing NETSCAN log: {log_path}")
+        if not os.path.exists(log_path):
+            print(f"  ✗ Log file not found: {log_path}")
             continue
             
-        event_type = event_type_match.group(1)
-        plugin = plugin_match.group(1)
-        ip = ip_match.group(1)
+        file_size = os.path.getsize(log_path)
+        print(f"  ✓ Log file size: {file_size} bytes")
         
-        # Extract TTL (always at the end of the line)
-        ttl_match = re.search(r'(\d+)$', line)
-        if ttl_match:
-            ttl_value = ttl_match.group(1)
-            hosts[ip]['ttl'] = ttl_value
-            hosts[ip]['os'] = detect_os_from_ttl(ttl_value)
+        netscan_data = parser.parse_netscan_data(log_path)
         
-        # Handle portscan events
-        if event_type == 'portscan':
-            # Extract port/service information
-            port_match = re.search(r':(tcp/\d+/[^:]+)-([^54]+)', line)
-            if port_match:
-                port_service = port_match.group(1)
-                service_info = port_match.group(2).strip()
-                hosts[ip]['plugins'][plugin][port_service] = service_info
-        
-        # Handle vulnerability events
-        elif event_type in ['vuln', 'cve']:
-            # Extract vulnerability information
-            if 'tcp/' in line:
-                port_match = re.search(r'(tcp/\d+/[^:]+):', line)
-                if port_match:
-                    port_service = port_match.group(1)
-                    vuln_info = ""
-                    
-                    if 'VULNERABLE' in line:
-                        vuln_info = "VULNERABLE"
-                    if 'CVE-' in line:
-                        cve_match = re.search(r'(CVE-\d+-\d+)', line)
-                        if cve_match:
-                            vuln_info += f" - {cve_match.group(1)}"
-                    
-                    # Add vulnerability to existing service or create new entry
-                    if port_service in hosts[ip]['plugins']['NmapTCPTop1000']:
-                        base_service = hosts[ip]['plugins']['NmapTCPTop1000'][port_service]
-                        hosts[ip]['plugins'][plugin][port_service] = f"{base_service} {vuln_info}"
-                    else:
-                        hosts[ip]['plugins'][plugin][port_service] = vuln_info
-    
-    return dict(hosts)
-
-def generate_markdown_report(hosts_data):
-    """
-    Generate Markdown format report with OS detection
-    """
-    markdown = "# NETSCAN REPORT:\n\n"
-    
-    for ip, data in hosts_data.items():
-        markdown += f"[+] {ip} (ttl={data['ttl']}, OS={data['os']}):\n"
-        
-        for plugin, services in data['plugins'].items():
-            for port_service, service_info in services.items():
-                markdown += f"\t[{plugin}] {port_service}: {service_info}\n"
-        
-        markdown += "\n"
-    
-    return markdown
-
-def generate_json_report(hosts_data):
-    """
-    Generate JSON format report with OS detection
-    """
-    json_data = {}
-    
-    for ip, data in hosts_data.items():
-        json_data[ip] = {
-            "OS": f"{data['os']} (ttl={data['ttl']})"
-        }
-        
-        # Add plugins
-        for plugin, services in data['plugins'].items():
-            json_data[ip][plugin] = {}
-            for port_service, service_info in services.items():
-                json_data[ip][plugin][port_service] = service_info
-    
-    return json.dumps(json_data, indent=2)
-
-def generate_xml_report(hosts_data):
-    """
-    Generate XML format report with OS detection
-    """
-    root = ET.Element("netscan_report")
-    
-    for ip, data in hosts_data.items():
-        host_elem = ET.SubElement(root, "host", ip=ip)
-        
-        os_elem = ET.SubElement(host_elem, "OS")
-        os_elem.text = f"{data['os']} (ttl={data['ttl']})"
-        
-        plugins_elem = ET.SubElement(host_elem, "plugins")
-        
-        for plugin, services in data['plugins'].items():
-            plugin_elem = ET.SubElement(plugins_elem, plugin)
+        if not netscan_data:
+            print(f"  ⚠ No NETSCAN data found in: {log_path}")
+            continue
             
-            for port_service, service_info in services.items():
-                # Parse protocol/port/service
-                parts = port_service.split('/')
-                if len(parts) >= 3:
-                    protocol = parts[0]
-                    port = parts[1]
-                    service_name = parts[2]
+        # Merge data from all logs
+        for ip, data in netscan_data.items():
+            print(f"  Found IP: {ip} with {len(data.get('services', []))} services")
+            
+            # Only update OS/TTL if not already set or if we have better info
+            if 'os' not in all_netscan_data[ip] or all_netscan_data[ip]['os'] == 'Unknown':
+                if 'os' in data and data['os'] != 'Unknown':
+                    all_netscan_data[ip]['os'] = data['os']
+            
+            if 'ttl' not in all_netscan_data[ip] or all_netscan_data[ip]['ttl'] == 'Unknown':
+                if 'ttl' in data and data['ttl'] != 'Unknown':
+                    all_netscan_data[ip]['ttl'] = data['ttl']
+            
+            # Merge services
+            all_netscan_data[ip]['services'].extend(data.get('services', []))
+    
+    print(f"Total IPs found: {len(all_netscan_data)}")
+    
+    if not all_netscan_data:
+        print("⚠ No NETSCAN data found in any log files!")
+        # Create empty reports with message
+        create_empty_reports(output_dir, "netscan", "No NETSCAN data found in log files")
+        return
+    
+    # Remove duplicates before generating reports
+    all_netscan_data = remove_duplicates(all_netscan_data)
+    
+    # Generate reports with merged and deduplicated data
+    generate_netscan_markdown(all_netscan_data, output_dir)
+    generate_netscan_json(all_netscan_data, output_dir)
+    generate_netscan_xml(all_netscan_data, output_dir)
+
+def remove_duplicates(netscan_data):
+    """Remove duplicate services from NETSCAN data"""
+    print("Removing duplicate services...")
+    
+    deduplicated_data = defaultdict(lambda: defaultdict(list))
+    duplicate_count = 0
+    
+    for ip, data in netscan_data.items():
+        # Copy OS and TTL information
+        deduplicated_data[ip]['os'] = data.get('os', 'Unknown')
+        deduplicated_data[ip]['ttl'] = data.get('ttl', 'Unknown')
+        
+        # Use a set to track unique services
+        seen_services = set()
+        unique_services = []
+        
+        for service in data.get('services', []):
+            # Create a unique identifier for the service
+            plugin, context = service
+            service_key = f"{plugin}:{context}"
+            
+            if service_key not in seen_services:
+                seen_services.add(service_key)
+                unique_services.append(service)
+            else:
+                duplicate_count += 1
+                print(f"  Removed duplicate service for {ip}: {service_key}")
+        
+        deduplicated_data[ip]['services'] = unique_services
+        
+        original_count = len(data.get('services', []))
+        unique_count = len(unique_services)
+        if original_count != unique_count:
+            print(f"  IP {ip}: {original_count} -> {unique_count} services (removed {original_count - unique_count} duplicates)")
+    
+    print(f"✓ Removed {duplicate_count} duplicate services total")
+    return deduplicated_data
+
+class NetScanParser:
+    def __init__(self):
+        self.netscan_data = defaultdict(lambda: defaultdict(list))
+
+    def parse_netscan_data(self, patterns_log_path):
+        """Parse NETSCAN data from a single patterns.log file"""
+        netscan_entries = 0
+        
+        try:
+            with open(patterns_log_path, 'r', encoding='utf-8', errors='ignore') as f:
+                for line_num, line in enumerate(f, 1):
+                    line = line.strip()
+                    if not line:
+                        continue
                     
-                    service_elem = ET.SubElement(plugin_elem, "service", 
-                                               protocol=protocol, 
-                                               port=port, 
-                                               name=service_name)
-                    service_elem.text = service_info
-    
-    # Pretty print XML
-    return ET.tostring(root, encoding='unicode', method='xml')
+                    # Debug: print first few lines to understand format
+                    if line_num <= 3:
+                        print(f"    Line {line_num}: {line}")
+                    
+                    # Parse the actual log format: 
+                    # [*] [20251107:22.48.40]:portscan:NmapTCPTop1000:200.87.125.227:portscan:tcp/143/imap-Dovecot imapd54
+                    
+                    # Remove the initial [*] 
+                    if line.startswith('[*] '):
+                        line = line[4:]  # Remove "[*] "
+                    
+                    # NEW APPROACH: Use regex to extract the components properly
+                    # Format: [timestamp]:phase:plugin:ip:context:service_details
+                    pattern = r'^\[([^\]]+)\]:([^:]+):([^:]+):([^:]+):([^:]+):(.+)$'
+                    match = re.match(pattern, line)
+                    
+                    if not match:
+                        print(f"    ✗ Line {line_num} doesn't match expected format")
+                        continue
+                    
+                    # Extract components from regex groups
+                    timestamp = match.group(1)  # "20251107:22.48.40"
+                    phase = match.group(2)      # "portscan"
+                    plugin = match.group(3)     # "NmapTCPTop1000"
+                    ip_address = match.group(4) # "200.87.125.227"
+                    context = match.group(5)    # "portscan" or "vuln" or "cve"
+                    service_details = match.group(6) # "tcp/143/imap-Dovecot imapd54"
+                    
+                    print(f"    Parsed - Phase: '{phase}', Plugin: '{plugin}', IP: '{ip_address}'")
+                    
+                    # Only process NETSCAN phases
+                    if phase == 'portscan':
+                        netscan_entries += 1
+                        self._process_netscan_entry(plugin, context, ip_address, service_details)
+                        print(f"    ✓ Processed NETSCAN entry #{netscan_entries}")
+                    else:
+                        print(f"    ✗ Skipping - not portscan phase: '{phase}'")
+            
+            print(f"  Processed {netscan_entries} NETSCAN entries")
+            
+        except Exception as e:
+            print(f"  ✗ Error parsing log file: {e}")
+            import traceback
+            traceback.print_exc()
+        
+        return self.netscan_data
 
-def generate_detailed_os_report(hosts_data):
-    """
-    Generate a separate detailed OS analysis report
-    """
-    report = "# OPERATING SYSTEM ANALYSIS REPORT\n\n"
-    report += "## OS Detection based on TTL Values\n\n"
-    report += "**Detection Rules:**\n"
-    report += "- TTL < 64: Linux\n"
-    report += "- TTL >= 64: Windows\n"
-    report += "- Unable to parse TTL: Unknown\n\n"
-    
-    report += "## Host Analysis\n\n"
-    
-    linux_hosts = []
-    windows_hosts = []
-    unknown_hosts = []
-    
-    for ip, data in hosts_data.items():
-        if data['os'] == 'Linux':
-            linux_hosts.append((ip, data['ttl']))
-        elif data['os'] == 'Windows':
-            windows_hosts.append((ip, data['ttl']))
+    def _process_netscan_entry(self, plugin, context, ip_address, service_details):
+        """Process a single NETSCAN entry"""
+        # Validate IP address
+        if not self._is_valid_ip(ip_address):
+            print(f"    Invalid IP: {ip_address}")
+            return
+        
+        # Extract TTL from service_details (look for numbers at the end)
+        ttl = self._extract_ttl(service_details)
+        os_type = "Linux" if ttl and ttl < 64 else "Windows" if ttl else "Unknown"
+        
+        # Store the data
+        self.netscan_data[ip_address]['os'] = os_type
+        self.netscan_data[ip_address]['ttl'] = ttl
+        
+        # Create service description
+        if context == 'portscan':
+            service_desc = f"portscan:{service_details}"
+        elif context in ['vuln', 'cve']:
+            service_desc = f"{context}:{service_details}"
         else:
-            unknown_hosts.append((ip, data['ttl']))
-    
-    report += "### Linux Hosts\n"
-    if linux_hosts:
-        for ip, ttl in linux_hosts:
-            report += f"- {ip} (TTL: {ttl})\n"
-    else:
-        report += "- No Linux hosts detected\n"
-    
-    report += "\n### Windows Hosts\n"
-    if windows_hosts:
-        for ip, ttl in windows_hosts:
-            report += f"- {ip} (TTL: {ttl})\n"
-    else:
-        report += "- No Windows hosts detected\n"
-    
-    report += "\n### Unknown OS Hosts\n"
-    if unknown_hosts:
-        for ip, ttl in unknown_hosts:
-            report += f"- {ip} (TTL: {ttl})\n"
-    else:
-        report += "- No unknown OS hosts detected\n"
-    
-    report += f"\n## Summary\n"
-    report += f"- Total hosts: {len(hosts_data)}\n"
-    report += f"- Linux hosts: {len(linux_hosts)}\n"
-    report += f"- Windows hosts: {len(windows_hosts)}\n"
-    report += f"- Unknown OS: {len(unknown_hosts)}\n"
-    
-    return report
+            service_desc = f"{context}:{service_details}"
+        
+        self.netscan_data[ip_address]['services'].append((plugin, service_desc))
+        
+        print(f"    Added service for {ip_address}: {plugin} - {service_desc} (TTL: {ttl}, OS: {os_type})")
 
-def save_reports(hosts_data, base_filename="netscan_report"):
-    """
-    Save all report formats to files
-    """
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    
-    # Generate reports
-    markdown_report = generate_markdown_report(hosts_data)
-    json_report = generate_json_report(hosts_data)
-    xml_report = generate_xml_report(hosts_data)
-    os_report = generate_detailed_os_report(hosts_data)
-    
-    # Save Main Markdown Report
-    md_filename = f"{base_filename}_{timestamp}.md"
-    with open(md_filename, 'w', encoding='utf-8') as f:
-        f.write(markdown_report)
-    print(f"Main Markdown report saved: {md_filename}")
-    
-    # Save OS Analysis Report
-    os_filename = f"{base_filename}_os_analysis_{timestamp}.md"
-    with open(os_filename, 'w', encoding='utf-8') as f:
-        f.write(os_report)
-    print(f"OS Analysis report saved: {os_filename}")
-    
-    # Save JSON
-    json_filename = f"{base_filename}_{timestamp}.json"
-    with open(json_filename, 'w', encoding='utf-8') as f:
-        f.write(json_report)
-    print(f"JSON report saved: {json_filename}")
-    
-    # Save XML
-    xml_filename = f"{base_filename}_{timestamp}.xml"
-    with open(xml_filename, 'w', encoding='utf-8') as f:
-        f.write(xml_report)
-    print(f"XML report saved: {xml_filename}")
-    
-    return md_filename, json_filename, xml_filename, os_filename
+    def _is_valid_ip(self, ip):
+        """Check if the string is a valid IP address"""
+        ip_pattern = r'^\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b$'
+        return re.match(ip_pattern, ip) is not None
 
-def print_os_summary(hosts_data):
-    """
-    Print a quick OS summary to console
-    """
-    print("\n" + "="*50)
-    print("QUICK OS DETECTION SUMMARY")
-    print("="*50)
-    
-    linux_count = 0
-    windows_count = 0
-    unknown_count = 0
-    
-    for ip, data in hosts_data.items():
-        if data['os'] == 'Linux':
-            linux_count += 1
-        elif data['os'] == 'Windows':
-            windows_count += 1
-        else:
-            unknown_count += 1
-    
-    print(f"Total hosts analyzed: {len(hosts_data)}")
-    print(f"Linux hosts: {linux_count}")
-    print(f"Windows hosts: {windows_count}")
-    print(f"Unknown OS: {unknown_count}")
-    print("="*50)
-
-def main():
-    """
-    Main function to process the log file and generate reports
-    """
-    # Read the log file
-    try:
-        with open('patterns.log', 'r', encoding='utf-8') as f:
-            log_content = f.read()
-    except FileNotFoundError:
-        print("Error: patterns.log file not found!")
-        return
-    except Exception as e:
-        print(f"Error reading file: {e}")
-        return
-    
-    # Parse the log file
-    print("Parsing log file...")
-    hosts_data = parse_log_file(log_content)
-    
-    if not hosts_data:
-        print("No data found in log file!")
-        return
-    
-    print(f"Found {len(hosts_data)} hosts in the log file")
-    
-    # Print quick OS summary
-    print_os_summary(hosts_data)
-    
-    # Generate and save reports
-    print("\nGenerating reports...")
-    md_file, json_file, xml_file, os_file = save_reports(hosts_data)
-    
-    print("\nReports generated successfully!")
-    print(f"- Main Markdown: {md_file}")
-    print(f"- OS Analysis: {os_file}")
-    print(f"- JSON: {json_file}")
-    print(f"- XML: {xml_file}")
-
-# Alternative function to process log content directly
-def process_log_content(log_content, base_filename="netscan_report"):
-    """
-    Process log content directly and generate reports
-    """
-    hosts_data = parse_log_file(log_content)
-    
-    if not hosts_data:
-        print("No data found in log content!")
+    def _extract_ttl(self, service_details):
+        """Extract TTL value from service details"""
+        # Look for 2-digit numbers at the end of the string
+        # Example: "tcp/143/imap-Dovecot imapd54" -> extract 54
+        if service_details and len(service_details) >= 2:
+            last_two = service_details[-2:]
+            if last_two.isdigit():
+                try:
+                    ttl = int(last_two)
+                    # TTL should be between 1 and 255
+                    if 1 <= ttl <= 255:
+                        return ttl
+                except ValueError:
+                    pass
+        
+        # Also try to find TTL in the text
+        ttl_patterns = [
+            r'ttl[=\s:]*(\d+)',
+            r'TTL[=\s:]*(\d+)',
+        ]
+        
+        for pattern in ttl_patterns:
+            match = re.search(pattern, service_details, re.IGNORECASE)
+            if match:
+                try:
+                    return int(match.group(1))
+                except ValueError:
+                    continue
+        
         return None
-    
-    print_os_summary(hosts_data)
-    return save_reports(hosts_data, base_filename)
 
-if __name__ == "__main__":
-    main()
+def generate_netscan_markdown(netscan_data, output_dir):
+    """Generate NETSCAN markdown report"""
+    content = ["# NETSCAN Report", ""]
+    
+    if not netscan_data:
+        content.append("No NETSCAN data available.")
+    else:
+        for ip, data in netscan_data.items():
+            ttl = data.get('ttl', 'Unknown')
+            os_type = data.get('os', 'Unknown')
+            content.append(f"[+] {ip} (ttl={ttl}, OS={os_type}):")
+            
+            services = data.get('services', [])
+            if services:
+                for plugin, context in services:
+                    content.append(f"    [{plugin}] {context}")
+            else:
+                content.append("    No services found")
+            content.append("")
+    
+    output_path = os.path.join(output_dir, "netscan.md")
+    with open(output_path, 'w', encoding='utf-8') as f:
+        f.write('\n'.join(content))
+    print(f"✓ NETSCAN Markdown report generated: {output_path}")
+
+
+def generate_netscan_json(netscan_data, output_dir):
+    """Generate NETSCAN JSON report"""
+    report = {"NETSCAN": {}}
+    
+    if netscan_data:
+        for ip, data in netscan_data.items():
+            ttl = data.get('ttl', 'Unknown')
+            os_type = data.get('os', 'Unknown')
+            
+            # Create IP entry with OS info
+            report["NETSCAN"][ip] = {
+                "OS": f"{os_type} (ttl={ttl})"
+            }
+            
+            # Add services as separate objects in an array
+            services_list = []
+            for plugin, context in data.get('services', []):
+                service_obj = {
+                    plugin: context
+                }
+                services_list.append(service_obj)
+            
+            # Add services array to the IP entry
+            report["NETSCAN"][ip]["services"] = services_list
+    
+    output_path = os.path.join(output_dir, "netscan.json")
+    with open(output_path, 'w', encoding='utf-8') as f:
+        json.dump(report, f, indent=2, ensure_ascii=False)
+    print(f"✓ NETSCAN JSON report generated: {output_path}")
+
+def generate_netscan_xml(netscan_data, output_dir):
+    """Generate NETSCAN XML report"""
+    root = ET.Element("NETSCAN")
+    
+    if netscan_data:
+        for ip, data in netscan_data.items():
+            ip_elem = ET.SubElement(root, "host")
+            ET.SubElement(ip_elem, "ip_address").text = ip
+            ET.SubElement(ip_elem, "os").text = data.get('os', 'Unknown')
+            ET.SubElement(ip_elem, "ttl").text = str(data.get('ttl', 'Unknown'))
+            
+            services_elem = ET.SubElement(ip_elem, "services")
+            for plugin, context in data.get('services', []):
+                service_elem = ET.SubElement(services_elem, "service")
+                ET.SubElement(service_elem, "plugin").text = plugin
+                ET.SubElement(service_elem, "details").text = context
+    else:
+        ET.SubElement(root, "message").text = "No NETSCAN data available"
+    
+    output_path = os.path.join(output_dir, "netscan.xml")
+    tree = ET.ElementTree(root)
+    tree.write(output_path, encoding='utf-8', xml_declaration=True)
+    print(f"✓ NETSCAN XML report generated: {output_path}")
+
+def create_empty_reports(output_dir, report_type, message):
+    """Create empty reports with a message"""
+    # Markdown
+    md_path = os.path.join(output_dir, f"{report_type}.md")
+    with open(md_path, 'w') as f:
+        f.write(f"# {report_type.upper()} Report\n\n{message}\n")
+    
+    # JSON
+    json_path = os.path.join(output_dir, f"{report_type}.json")
+    with open(json_path, 'w') as f:
+        json.dump({report_type.upper(): {"message": message}}, f, indent=2)
+    
+    # XML
+    xml_path = os.path.join(output_dir, f"{report_type}.xml")
+    root = ET.Element(report_type.upper())
+    ET.SubElement(root, "message").text = message
+    tree = ET.ElementTree(root)
+    tree.write(xml_path, encoding='utf-8', xml_declaration=True)
+    
+    print(f"⚠ Created empty {report_type} reports with message: {message}")

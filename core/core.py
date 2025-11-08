@@ -11,7 +11,7 @@ from helpers.io import error, info, fail
 from helpers.utils import parse_targets, calculate_elapsed_time
 from loaders.pluginsloaders import PluginLoader
 from loaders.modulesloaders import ModulesLoader
-from loaders.reportsloaders import DoReports
+from loaders.reportsloaders import ReportsLoader
 
 m_loader = ModulesLoader()
 p_loader = PluginLoader()
@@ -42,13 +42,19 @@ async def start_run(module, args, targets):  # noqa: RUF029
             for future in as_completed(futures):
                 try:
                     result = future.result()
-                    #DoReports(args.module)
                     info('{bgreen}Finished all targets in {elapsed_time}!{rst}', 
                           elapsed_time=calculate_elapsed_time(start_time))
                 except Exception as e:
                     error(f"Error processing target: {e}")
         except KeyboardInterrupt:
             fail("Interrupted by user")
+        
+        if "osint" in args.module:
+            osint_loader = ReportsLoader("osint")
+            osint_loader.generate_reports()
+        else:
+            netscan_loader = ReportsLoader("netscan") 
+            netscan_loader.generate_reports()
         
         #elapsed_time = self.calculate_elapsed_time(start_time)
         #self.info('{bgreen}Finished all targets in {elapsed_time}!{rst}')
@@ -106,6 +112,10 @@ def main() -> None:
         module_plugins = {m: props for m, props in plugins.items() if args.module in props["supported_modules"]}
         for plugs, descriptions in module_plugins.items():
             info("{plug} - {description}", plug=plugs, description=descriptions['description'])
+    
+    if args.module and args.results:
+        loader = ReportsLoader(args.module)
+        loader.generate_reports_from_dir(args.results)
 
     try:
         asyncio.run(start_run(module_path, args, targets))
