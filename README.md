@@ -32,8 +32,8 @@ sudo apt install python3-venv
 ```
 
 ### Installation Method (Manually)
-Install and execute `bit00.py` from within the RECON directory, install the dependencies:
-**Not recommended***
+
+Install `bit00.py` the dependencies directly to machine:**Not recommended***
 
 ```bash
 (root) pip install -r requirements.txt --break-system-packages 
@@ -54,8 +54,6 @@ Exit the virtual enviromment:
 ```
 
 ## Usage
-
-BIT00 uses Python 3 specific functionality and does not support Python 2.
 
 * OSINT MODULE
 
