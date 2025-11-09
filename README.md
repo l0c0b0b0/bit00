@@ -69,9 +69,9 @@ sudo sudo apt install seclists curl dnsrecon enum4linux feroxbuster gobuster imp
 
 Results are saved in multiple formats:
 
-> results.json - Machine readable
-> results.md - Human readable
-> results.xml - Standard format
+- results.json - Machine readable
+- results.md - Human readable
+- results.xml - Standard format
 
 ```text
 results/
@@ -93,10 +93,10 @@ results/
 
 ## 🔧 Verbosity Levels
 
-> (no flag): Basic progress updates
-> -v: Plugin starts and important findings
-> -vv: Commands being executed and pattern matches
-> -vvv: Full debug output (use sparingly)
+- (no flag): Basic progress updates
+- -v: Plugin starts and important findings
+- -vv: Commands being executed and pattern matches
+- -vvv: Full debug output (use sparingly)
 
 ## 🆘 Help
 
