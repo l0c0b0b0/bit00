@@ -17,16 +17,16 @@ def generate_reports(patterns_log_paths, output_dir):
     for log_path in patterns_log_paths:
         debug(f"Processing NETSCAN log: {log_path}")
         if not os.path.exists(log_path):
-            error(f"  ✗ Log file not found: {log_path}")
+            error(f"  Log file not found: {log_path}")
             continue
             
         file_size = os.path.getsize(log_path)
-        debug(f"  ✓ Log file size: {file_size} bytes")
+        debug(f"  Log file size: {file_size} bytes")
         
         netscan_data = parser.parse_netscan_data(log_path)
         
         if not netscan_data:
-            error(f"  ⚠ No NETSCAN data found in: {log_path}")
+            error(f"  No NETSCAN data found in: {log_path}")
             continue
             
         # Merge data from all logs
@@ -48,7 +48,7 @@ def generate_reports(patterns_log_paths, output_dir):
     info("Total IPs found: {byellow}{total_ips}{rst}", total_ips =len(all_netscan_data))
     
     if not all_netscan_data:
-        error("⚠ No NETSCAN data found in any log files!")
+        error("No NETSCAN data found in any log files!")
         # Create empty reports with message
         create_empty_reports(output_dir, "netscan", "No NETSCAN data found in log files")
         return
@@ -96,7 +96,7 @@ def remove_duplicates(netscan_data):
         if original_count != unique_count:
             debug(f"  IP {ip}: {original_count} -> {unique_count} services (removed {original_count - unique_count} duplicates)")
     
-    debug(f"✓ Removed {duplicate_count} duplicate services total")
+    debug(f"Removed {duplicate_count} duplicate services total")
     return deduplicated_data
 
 class NetScanParser:
@@ -148,14 +148,14 @@ class NetScanParser:
                     if phase == 'portscan':
                         netscan_entries += 1
                         self._process_netscan_entry(plugin, context, ip_address, service_details)
-                        debug(f"    ✓ Processed NETSCAN entry #{netscan_entries}")
+                        debug(f"    Processed NETSCAN entry #{netscan_entries}")
                     else:
-                        debug(f"    ✗ Skipping - not portscan phase: '{phase}'")
+                        debug(f"    Skipping - not portscan phase: '{phase}'")
             
             debug(f"  Processed {netscan_entries} NETSCAN entries")
             
         except Exception as e:
-            error(f"  ✗ Error parsing log file: {e}")
+            error(f"  Error parsing log file: {e}")
             import traceback
             traceback.print_exc()
         
@@ -323,4 +323,4 @@ def create_empty_reports(output_dir, report_type, message):
     tree = ET.ElementTree(root)
     tree.write(xml_path, encoding='utf-8', xml_declaration=True)
     
-    warn(f"⚠ Created empty {report_type} reports with message: {message}")
+    warn(f"Created empty {report_type} reports with message: {message}")

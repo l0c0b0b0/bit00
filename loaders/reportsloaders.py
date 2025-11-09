@@ -57,7 +57,7 @@ class ReportsLoader:
             base_dir = os.path.join(self.current_dir, "recon")
             
         if os.path.exists(base_dir):
-            debug(f"✓ Base directory exists: {base_dir}")
+            debug(f"Base directory exists: {base_dir}")
             # List targets in the base directory
             targets = [d for d in os.listdir(base_dir) if os.path.isdir(os.path.join(base_dir, d))]
             debug(f"  Found targets: {targets}")
@@ -67,11 +67,11 @@ class ReportsLoader:
                 logs_dir = os.path.join(base_dir, target, "logs")
                 patterns_file = os.path.join(logs_dir, "patterns.log")
                 if os.path.exists(patterns_file):
-                    debug(f"  ✓ Found patterns.log for {target}: {patterns_file}")
+                    debug(f"  Found patterns.log for {target}: {patterns_file}")
                 else:
-                    debug(f"  ✗ No patterns.log for {target} (logs dir exists: {os.path.exists(logs_dir)})")
+                    debug(f"  No patterns.log for {target} (logs dir exists: {os.path.exists(logs_dir)})")
         else:
-            error(f"✗ Base directory not found: {base_dir}")
+            error(f"Base directory not found: {base_dir}")
             error(f"  Current directory contents: {os.listdir(self.current_dir)}")
         
         debug(f"Found {len(self.patterns_logs)} patterns.log files for {self.module_name}:")
@@ -123,11 +123,11 @@ class ReportsLoader:
                 info("Successfully generated reports for {bgreen}{self.module_name}{rst}")
                 return True
             else:
-                error(f"✗ Module {self.module_name} doesn't have generate_reports function")
+                error(f"Module {self.module_name} doesn't have generate_reports function")
                 return False
                 
         except Exception as e:
-            error(f"✗ Error loading module {self.module_name}: {str(e)}")
+            error(f"Error loading module {self.module_name}: {str(e)}")
             import traceback
             traceback.print_exc()
             return False
@@ -143,7 +143,7 @@ class ReportsLoader:
         logs_found = self.discover_patterns_logs()
         
         if not logs_found:
-            error(f"✗ No patterns.log files found for {self.module_name}")
+            error(f"No patterns.log files found for {self.module_name}")
             error(f"Please make sure you have run scans first.")
             error(f"Expected location: {self.current_dir}/{self.module_name}/*/logs/patterns.log")
             return False
@@ -152,10 +152,10 @@ class ReportsLoader:
         success = self.load_module_report()
         
         if success:
-            info("✓ Completed {bgreen}{mu}{rst} report generation")
+            info("Completed {bgreen}{mu}{rst} report generation")
             info("Reports saved to: {bblue}{_dir}/{rst}", _dir=self.reports_dir)
         else:
-            error(f"✗ Failed to generate {self.module_name.upper()} reports")
+            error(f"Failed to generate {self.module_name.upper()} reports")
             
         return success
 
@@ -174,7 +174,7 @@ class ReportsLoader:
         
         # Validate the search directory
         if not os.path.exists(search_dir):
-            error(f"✗ Search directory not found: {search_dir}")
+            error(f"Search directory not found: {search_dir}")
             return False
         
         # Set custom output directory if provided
@@ -186,7 +186,7 @@ class ReportsLoader:
         logs_found = self.discover_patterns_logs_from_dir(search_dir)
         
         if not logs_found:
-            error(f"✗ No patterns.log files found in: {search_dir}")
+            error(f"No patterns.log files found in: {search_dir}")
             return False
         
         # Load and execute the module's report generator
@@ -196,6 +196,6 @@ class ReportsLoader:
             info("Completed {bgreen}{mu}{rst} report generation")
             info("Reports saved to: {bblue}{re_dir}{rst}/", re_dir=self.reports_dir)
         else:
-            error(f"✗ Failed to generate {self.module_name.upper()} reports")
+            error(f"Failed to generate {self.module_name.upper()} reports")
             
         return success

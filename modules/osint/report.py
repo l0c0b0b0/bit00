@@ -22,7 +22,7 @@ def generate_reports(patterns_log_paths, output_dir):
             continue
             
         file_size = os.path.getsize(log_path)
-        debug(f"  ✓ Log file size: {file_size} bytes")
+        debug(f"  Log file size: {file_size} bytes")
         
         osint_data, basedomains = parser.parse_osint_data(log_path)
         
@@ -30,7 +30,7 @@ def generate_reports(patterns_log_paths, output_dir):
             all_basedomains.add(domain)
         
         if not osint_data:
-            error(f"  ⚠ No OSINT data found in: {log_path}")
+            error(f"  No OSINT data found in: {log_path}")
             continue
             
         # Merge data from all logs
@@ -46,7 +46,7 @@ def generate_reports(patterns_log_paths, output_dir):
     info("Total subdomains found: {byellow}{num}{rst}", num=len(all_osint_data))
     
     if not all_osint_data:
-        error("⚠ No OSINT data found in any log files!")
+        error("No OSINT data found in any log files!")
         # Create empty reports with message
         create_empty_reports(output_dir, "osint", "No OSINT data found in log files")
         return
@@ -119,7 +119,7 @@ class OSINTParser:
             debug(f"  Processed {osint_entries} OSINT entries")
             
         except Exception as e:
-            error(f"  ✗ Error parsing log file: {e}")
+            error(f"  Error parsing log file: {e}")
             import traceback
             traceback.print_exc()
         
@@ -451,4 +451,4 @@ def create_empty_reports(output_dir, report_type, message):
     tree = ET.ElementTree(root)
     tree.write(xml_path, encoding='utf-8', xml_declaration=True)
     
-    error(f"⚠ Created empty {report_type} reports with message: {message}")
+    error(f"Created empty {report_type} reports with message: {message}")
