@@ -106,5 +106,5 @@ python bit00.py osint --help
 python bit00.py netscan -L  # List plugins
 ```
 
-> [!Note]:
+> [!NOTE]:
 > BIT00 performs reconnaissance only - no exploitation or attacks.
