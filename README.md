@@ -53,13 +53,13 @@ python bit00.py netscan 10.10.10.5 -p full -v
 
 ## 🛠️ Required Tools
 
-### OSINT Tools:
+### OSINT Tools
 
 ```bash
 sudo apt install spiderfoot dnsrecon fierce cloud_enum asn metagoofil dnsutils
 ```
 
-### NETSCAN Tools:
+### NETSCAN Tools
 
 ```bash
 sudo sudo apt install seclists curl dnsrecon enum4linux feroxbuster gobuster impacket-scripts nbtscan nmap redis-tools smbclient smbmap snmp sslscan sipvicious whatweb cmseek nuclei netexec
