@@ -1,208 +1,110 @@
-# BIT00
+# 🔍 BIT00 - Automated Reconnaissance Tool
 
-BIT00 is a multi-threaded reconnaissance tool which performs automated enumeration of osint, subdomains and ports. It is intended as a time-saving tool on penetration testing.
+BIT00 automates OSINT gathering and network scanning to save time on security assessments.
 
-The tool is splited into different modules, like OSINT - NETSCAN. Future work will be implemented LDAP for internal enumeration.
+> **⚠️ Legal Notice**: Only use on systems you own or have explicit permission to test.
 
-The tool works by firstly performing reconnaissance face before testing each host, even for the OSINT. From those initial results of the reconnaissance, the tool will launch further enumeration scans of those services or targets using a number of different tools.
+## 🚀 Quick Start
 
-Everything in the tool is highly configurable. The author will not be held responsible for negative actions that result from the mis-use of this tool.
+### Prerequisites
 
-> Disclaimer:
-> While BIT00 endeavors to perform as much identification and enumeration of services as possible, there is no guarantee that every service will be identified, or that every service will be fully enumerated.
+- Linux (Kali, Ubuntu, Debian recommended)
+- Python 3.8 or higher
+- Root/sudo access for tool installation
 
-## Installation
+### Installation
 
-BIT00 is a manually installation. Before installation using any of these methods, certain requirements need to be fulfilled. If you have not refreshed your apt cache recently, run the following command so you are installing the latest available packages:
-
-
-```bash
-sudo apt update
-```
-
-### Python3
-
-BIT00 requires the usage of Python3.13 and pip, which can be installed on Kali Linux using the following commands:
-***possible to install on any linux if the tools are installed also***
+1. **Update your system, install Python required packages:**
 
 ```bash
-sudo apt install python3
-sudo apt install python3-pip
-sudo apt install python3-venv
+sudo apt update && sudo apt install python3 python3-pip python3-venv
 ```
 
-### Installation Method (Manually)
-
-Install `bit00.py` the dependencies directly to machine:**Not recommended***
+2. **Set up virtual environment:**
 
 ```bash
-(root) pip install -r requirements.txt --break-system-packages 
+python3 -m venv .bit00
+source .bit00/bin/activate
 ```
 
-You can also create a VirtualEnviroment with python3 if you don't want to install on your OS the packages:
+3. **set up virtual environment:**
 
 ```bash
-(root) python3 -m venv .bit00
-(root) source .bit00/bin/activate
-(root) pip install -r requirements.txt
+pip install -r requirements.txt
 ```
 
-Exit the virtual enviromment:
+## 📖 Basic Usage
+
+Gather intelligence about domains and organizations.
+
+**OSINT Basic usage:**
 
 ```bash
-(root) (bit00) deactivate
+python bit00.py osint example.com
+python bit00.py osint company.com -v -ct 3
 ```
 
-## Usage
+**NetScan Basic usage:**
 
-* OSINT MODULE
-
+```bash
+python bit00.py netscan 192.168.1.0/24
+python bit00.py netscan 10.10.10.5 -p full -v
 ```
 
-usage: bit00.py osint [-h] [-ct <number>] [-cs <number>] [-V] [-o OUTPUTDIR] [-oor] [-L] [-P PLUGIN] [-v] [--only-scans-dir] [targets ...]
+## 🛠️ Required Tools
 
-Perform OSINT reconnaissance to a domain
-
-positional arguments:
-  targets               Resolvable Hostname, IP addresses or CIDR notation.
-
-options:
-  -h, --help            show this help message and exit
-  -ct, --concurrent-targets <number>
-                        The maximum number of target hosts to scan concurrently. Default: 5
-  -cs, --concurrent-scans <number>
-                        The maximum number of scans to perform per target host. Default: 10
-  -V, --version         Display version information and exit
-  -o, --output OUTPUTDIR
-                        The output directory for results. Default: osint
-  -oor, --only-osint-recon
-                        Only reconnaissance phase the "scans" tools will NOT be running.
-  -L, --list-plugins    List all available OSINT plugins
-  -P, --plugin PLUGIN   Run specific plugin instead of full scan
-  -v, --verbose         Enable verbose output. Repeat for more verbosity.
-  --only-scans-dir      Only create the "scans" directory for results.
-
-```
-
-* NETSCAN MODULE
-
-```
-
-usage: bit00.py netscan [-h] [-ct <number>] [-cs <number>] [-V] [-ops] [-p PROFILE] [-L] [-P PLUGIN] [-v] [-o OUTPUTDIR] [--only-scans-dir] [targets ...]
-
-Network reconnaissance tool to port scan and automatically enumerate services on multiple targets.
-
-positional arguments:
-  targets               IP addresses (e.g. 10.0.0.1), CIDR notation (e.g. 10.0.0.1/24), or resolvable hostnames (e.g. foo.bar) to scan.
-
-options:
-  -h, --help            show this help message and exit
-  -ct, --concurrent-targets <number>
-                        The maximum number of target hosts to scan concurrently. Default: 5
-  -cs, --concurrent-scans <number>
-                        The maximum number of scans to perform per target host. Default: 10
-  -V, --version         Display version information and exit
-  -ops, --only-portscan
-                        Only scan open ports and ips, enumeration services will NOT run. Default: False
-  -p, --profile PROFILE
-                        The port scanning profiles: default(TCP TOP1000),full(TCP 65535). Ex.bit00.py netscan <ipaddress> -p full Default: default
-  -L, --list-plugins    List all available OSINT plugins
-  -P, --plugin PLUGIN   Run specific plugin instead of full scan
-  -v, --verbose         Enable verbose output. Repeat for more verbosity.
-  -o, --output OUTPUTDIR
-                        The output directory for results. Default: recon
-  --only-scans-dir      Only create the "scans" directory for results. Other directories (e.g. exploit, loot, report) will not be created. Default: false
-```
-
-### Supporting Packages
-
-Several commands used in BIT00 may need to be installed, deppending on your OS:
-
-| OSINT TOOLS | NETSCAN TOOLS |
-|----------|----------|
-|   spiderfoot    |   seclist     |
-|   dnsrecon      |   curl        |
-|   fierce        |   dnsrecon    |
-|   cloud_enum    |   gobuster    |
-|   asn           |   feroxbuster |
-|   metagoofil    |   kerberoast  |
-|   dnsutils      |   cmseek      |
-|                 |   masscan     |
-|                 |   enum4linux  |
-|                 |   gobuster    |
-|                 |   impacket-scripts  |
-|                 |   nbtscan           |
-|                 |   nmap        |
-|                 |   redis-tools |
-|                 |     smbclient     |
-|                 | smbmap      |
-|                 | snmpwalk    |
-|                 |   sslscan   |
-|                 | svwar   |
-|                 | whatweb |
-|                 | nuclei  |
-|                 | netexec |
-
-
-On Kali Linux, you can ensure all the tools are installed using the following commands:
-
-* OSINT MODULE
+### OSINT Tools:
 
 ```bash
 sudo apt install spiderfoot dnsrecon fierce cloud_enum asn metagoofil dnsutils
 ```
 
-* NETSCAN MODULE
+### NETSCAN Tools:
 
 ```bash
-sudo apt install seclists curl dnsrecon enum4linux feroxbuster gobuster impacket-scripts nbtscan nmap redis-tools smbclient smbmap snmp sslscan sipvicious whatweb cmseek nuclei netexec
+sudo sudo apt install seclists curl dnsrecon enum4linux feroxbuster gobuster impacket-scripts nbtscan nmap redis-tools smbclient smbmap snmp sslscan sipvicious whatweb cmseek nuclei netexec
 ```
 
-### Verbosity
+## 📊 Output
 
-BIT00 supports four levels of verbosity:
+Results are saved in multiple formats:
 
-* (none) Minimal output. BIT00 will announce when scanning targets starts / ends.
-* (-v) Verbose output. BIT00 will additionally announce when plugins start running, and report found.
-* (-vv) Very verbose output. BIT00 will additionally specify the exact commands which are being run by plugins, highlight any patterns which are matched in command output, and announce when plugins end.
-* (-vvv) Very, very verbose output. BIT00 will output everything. Literally every line from all commands which are currently running. When scanning multiple targets concurrently, this can lead to a ridiculous amount of output. It is not advised to use -vvv unless you absolutely need to see live output from commands.
+> results.json - Machine readable
+> results.md - Human readable
+> results.xml - Standard format
 
-### Results
-
+```text
+results/
+├── results.json          # Structured data (JSON)
+├── results.md            # Human-readable report
+├── results.xml           # Machine-readable report
+├── osint/
+│   └── example.com/
+│       ├── logs/
+│       │   ├── commands.log    # All commands executed
+│       │   ├── error.log       # Error messages
+│       │   └── patterns.log    # Pattern matches
+│       └── scans/              # Scan results
+└── recon/
+    └── 10.10.10.5/
+        ├── logs/               # Scan logs
+        └── scans/              # Port scan results
 ```
 
-├── rsults.json
-├── rsults.md
-├── results.xml
-├── osint
-│   └── patito.com
-│       ├── logs
-│       │   ├── commands.log
-│       │   ├── error.log
-│       │   └── patterns.log
-│       └── scans
-│           ├── infon
-│           ├── recon
-│           └── tech
-└── recon
-    └── 10.11.10.10
-        ├── logs
-        │   ├── commands.log
-        │   ├── error.log
-        │   └── patterns.log
-        └── scans
-            ├── gnmap
-            └── xml
+## 🔧 Verbosity Levels
 
+> (no flag): Basic progress updates
+> -v: Plugin starts and important findings
+> -vv: Commands being executed and pattern matches
+> -vvv: Full debug output (use sparingly)
+
+## 🆘 Help
+
+```bash
+python bit00.py --help
+python bit00.py osint --help
+python bit00.py netscan -L  # List plugins
 ```
 
-The logs directory is where all masscan/nmap scans data will save. This information is only for the port-scan-profiles.toml's commands:
-
-* \commands.log contains a list of every command BIT00 ran against the target. This is useful if one of the commands fails and you want to run it again with modifications.
-
-* If output matches of a defined pattern, will be log in the \patterns.log file.
-
-* If a scan results in an error, a file called \errors.log will also appear in the logs directory with some details to alert the user.
-
-> [!NOTE]
-> BIT00 does NOT make any exploit o execute any PoC, its only reconnaissance!!!
+> [!Note]:
+> BIT00 performs reconnaissance only - no exploitation or attacks.
