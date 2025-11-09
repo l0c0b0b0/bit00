@@ -141,8 +141,10 @@ class OSINTParser:
             self._process_dnsenum(plugin, target, content)
         elif desc == 'geoinfo':
             self._process_geoinfo(plugin, target, content)
-        elif desc in ['tech', 'ostech', 'webtech']:
-            self._process_tech(plugin, desc, target, content)
+        elif desc == 'ostech':
+            self._process_ostech(plugin, desc, target, content)
+        elif desc == 'webtech':
+            self._process_webtech(plugin, desc, target, content)
 
     def _process_email(self, plugin, target, content):
         """Process email entries"""
@@ -195,7 +197,7 @@ class OSINTParser:
         if base_domain:
             entry = {
                 'plugin': plugin,
-                'content': content[:80]  # Limit content length
+                'content': content[:500]  # Limit content length
             }
             # Check for duplicates before adding
             if not self._is_duplicate_in_list(self.osint_data[base_domain]['dnsenum'], entry):
@@ -232,7 +234,7 @@ class OSINTParser:
                 if not self._is_duplicate_in_list(self.osint_data[base_domain]['geoinfo'], entry):
                     self.osint_data[base_domain]['geoinfo'].append(entry)
 
-    def _process_tech(self, plugin, desc, target, content):
+    def _process_ostech(self, plugin, desc, target, content):
         """Process technology entries (tech, ostech, webtech)"""
         # Check if target is an IP address
         if self._is_valid_ip(target):
@@ -261,6 +263,35 @@ class OSINTParser:
                 # Check for duplicates before adding
                 if not self._is_duplicate_in_list(self.osint_data[base_domain][desc], entry):
                     self.osint_data[base_domain][desc].append(entry)
+    
+    def _process_webtech(self, plugin, desc, target, content):
+        """Process technology entries (tech, ostech, webtech)"""
+        # Check if target is an IP address
+        if self._is_valid_ip(target):
+            ip = target
+            hostname = self.ip_to_hostname.get(ip)
+            if hostname:
+                target_key = f"{hostname}:{ip}"
+            else:
+                target_key = f"unknown:{ip}"
+            
+            entry = {
+                'plugin': plugin,
+                'content': content[:90]  # Limit content length
+            }
+            # Check for duplicates before adding
+            if not self._is_duplicate_in_list(self.osint_data[target_key][desc], entry):
+                self.osint_data[target_key][desc].append(entry)
+        else:
+            # Target is a domain
+            if target:
+                entry = {
+                    'plugin': plugin,
+                    'content': content[:90]  # Limit content length
+                }
+                # Check for duplicates before adding
+                if not self._is_duplicate_in_list(self.osint_data[target][desc], entry):
+                    self.osint_data[target][desc].append(entry)             
 
     def _is_duplicate_in_list(self, entry_list, new_entry):
         """Check if an entry already exists in the list"""
@@ -275,17 +306,23 @@ class OSINTParser:
         """Extract base domain from full domain"""
         if self._is_valid_ip(domain):
             return None
-            
+        
         parts = domain.split('.')
+        # For domains like bancontinental.com.py, we want the last 3 parts
+        # For regular domains like example.com, we want the last 2 parts
+        if len(parts) >= 3:
+            # Check if it's a two-part TLD like .com.py, .co.uk, etc.
+            if len(parts[-1]) <= 3 and len(parts[-2]) <= 3:
+                return '.'.join(parts[-3:])  # Return last 3 parts for two-part TLDs
         if len(parts) >= 2:
-            return '.'.join(parts[-2:])
+            return '.'.join(parts[-2:])  # Return last 2 parts for regular domains
         return domain
 
     def _is_valid_ip(self, ip):
         """Check if the string is a valid IP address"""
         ip_pattern = r'^\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b$'
-        return re.match(ip_pattern, ip) is not None
-
+        return re.match(ip_pattern, ip) is not None  
+    
 def generate_osint_markdown(osint_data, basedomains, output_dir):
     """Generate OSINT markdown report"""
     content = ["# OSINT REPORT", ""]
@@ -309,10 +346,10 @@ def generate_osint_markdown(osint_data, basedomains, output_dir):
                     content.append(f"\t[{entry['plugin']}] dnsenum: {entry.get('content', '')}")
             
             # Add webtech entries for base domain
-            if basedomain in osint_data and 'webtech' in osint_data[basedomain]:
-                for entry in osint_data[basedomain]['webtech']:
-                    content.append(f"\t[{entry['plugin']}] tech: {entry.get('content', '')}")
-            
+            if basedomain in osint_data and 'geoinfo' in osint_data[basedomain]:
+                for entry in osint_data[basedomain]['geoinfo']:
+                    content.append(f"\t[{entry['plugin']}] geoinfo: {entry.get('content', '')}")
+
             content.append("")
         
         # Add host entries (hostname:ip format)
@@ -324,9 +361,9 @@ def generate_osint_markdown(osint_data, basedomains, output_dir):
             content.append(f"[+] {hostname}:{ip}")
             
             # Technology entries
-            if 'tech' in osint_data[target]:
-                for entry in osint_data[target]['tech']:
-                    content.append(f"\t[{entry['plugin']}] tech: {entry.get('content', '')}")
+            if 'webtech' in osint_data[hostname]:
+                for entry in osint_data[hostname]['webtech']:
+                    content.append(f"\t[{entry['plugin']}] webtech: {entry.get('content', '')}")
             
             # OS Technology entries
             if 'ostech' in osint_data[target]:
