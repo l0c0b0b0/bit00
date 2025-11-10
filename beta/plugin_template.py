@@ -143,7 +143,7 @@ async def test_plugin():
     print("=== Testing ScrapingGitHub Plugin ===")
     
     # Create plugin instance
-    plugin = ScrapingGitHub()
+    plugin = NewPlugin()
     
     # Test parameters
     target = 'baneco.com.bo'
