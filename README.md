@@ -84,11 +84,11 @@ Results are saved in multiple formats:
 │       └── scans/              # Scan results
 ├── recon/
 |    └── 10.10.10.5/
-|        ├── logs/
-|        │   ├── commands.log    # All commands executed
-|        │   ├── error.log       # Error messages
-|        │   └── patterns.log    # Pattern matches
-|        └── scans/              # Scan results
+│        ├── logs/
+│        │   ├── commands.log    # All commands executed
+│        │   ├── error.log       # Error messages
+│        │   └── patterns.log    # Pattern matches
+│        └── scans/              # Scan results
 └──results/
     ├── results.json          # Structured data (JSON)
     ├── results.txt           # Human-readable report
