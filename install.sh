@@ -85,6 +85,7 @@ for tool in "${tools[@]}"; do
     fi
 done
 
+read -p "Do you want to procced the installation? (Y/n): " use_default
 # Step 3: Install Packages and Tools
 echo ""
 echo -e "${BLUE}[3] Install Packages and Tools:${NC}"
@@ -102,11 +103,11 @@ sudo apt install git jq python3-colorama python3-tldextract curl -y
 
 # OSINT Tools
 echo -e "${BLUE}[+] Installing OSINT tools...${NC}"
-sudo apt install spiderfoot dnsrecon fierce cloud-enum asn dnsutils theharvester -y
+#sudo apt install spiderfoot dnsrecon fierce cloud-enum asn dnsutils theharvester -y
 
 # NETSCAN Tools
 echo -e "${BLUE}[+] Installing NETSCAN tools...${NC}"
-sudo apt install seclists dnsrecon enum4linux feroxbuster gobuster impacket-scripts nbtscan nmap redis-tools smbclient smbmap snmp sslscan sipvicious whatweb cmseek nuclei netexec ffuf -y
+#sudo apt install seclists dnsrecon enum4linux feroxbuster gobuster impacket-scripts nbtscan nmap redis-tools smbclient smbmap snmp sslscan sipvicious whatweb cmseek nuclei netexec ffuf -y
 
 # Step 4: Configure Golang
 echo ""
