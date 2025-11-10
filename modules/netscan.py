@@ -222,7 +222,7 @@ class netscan:
 
             # Execute the async operations
             await self.execute_async()
-            return info("NetScan reconnaissance against {bred}{target}{rst} finished successfully in {time}", 
+            return info("NetScan reconnaissance against {byellow}{target}{rst} finished successfully in {time}", 
                         target=target, time=calculate_elapsed_time(start_time))
             
         except Exception as e:

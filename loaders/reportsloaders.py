@@ -135,9 +135,9 @@ class ReportsLoader:
     def generate_reports(self):
         """Generate reports for the specific module"""
         mu=self.module_name.upper()
-        info("{bgreen}{mysc}{rst}", mysc='='*50)
-        info("Generating reports for:{bgreen}{mu}{rst}")
-        info("{bgreen}{mysc}{rst}", mysc='='*50)
+        info("{byellow}{mysc}{rst}", mysc='='*50)
+        info("{byellow}Processing reports for: {mu}{rst}")
+        info("{byellow}{mysc}{rst}", mysc='='*50)
         
         # First discover all patterns.log files
         logs_found = self.discover_patterns_logs()
@@ -168,9 +168,9 @@ class ReportsLoader:
         """
         mu=self.module_name.upper()
         ddir = search_dir
-        info("{bgreen}{mysc}{rst}", mysc='='*50)
-        info("Generating {bgreen}{mu}{rst} reports from directory: {bgreen}{ddir}{rst}")
-        info("{bgreen}{mysc}{rst}", mysc='='*50)
+        info("{byellow}{mysc}{rst}", mysc='='*50)
+        info("{byellow}Processing {mu} reports from directory: {ddir}{rst}")
+        info("{byellow}{mysc}{rst}", mysc='='*50)
         
         # Validate the search directory
         if not os.path.exists(search_dir):

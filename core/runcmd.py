@@ -217,18 +217,18 @@ class RegexPatterns:
                         _port, _service, version, ttl = _match
                         if not version and ttl:
                             srv = (proto, _port, _service, None, ttl)
-                            log_pattern(output, tag, "portscan", f"{proto}/{_port}/{_service}-{ttl}")
+                            log_pattern(output, tag, "portscan", f"{proto}/{_port}/{_service} => {ttl}")
                         
                         if not ttl and version:
                             srv = (proto, _port, _service, version, None)
-                            log_pattern(output, tag, "portscan", f"{proto}/{_port}/{_service}-{version}")
+                            log_pattern(output, tag, "portscan", f"{proto}/{_port}/{_service} => {version}")
                         
                         if not ttl and not version:
                             srv = (proto, _port, _service, None, None)
                             log_pattern(output, tag, "portscan", f"{proto}/{_port}/{_service}")
                         
                         srv = (proto, _port, _service, version, ttl)
-                        log_pattern(output, tag, "portscan", f"{proto}/{_port}/{_service}-{version}{ttl}")
+                        log_pattern(output, tag, "portscan", f"{proto}/{_port}/{_service} => {version}{ttl}")
                 
                 if srv not in matches:
                     matches.append(srv)

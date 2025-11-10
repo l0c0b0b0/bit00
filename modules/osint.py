@@ -254,7 +254,7 @@ class osint:
 
             # Execute the async operations
             await self.execute_async()
-            return info("OSINT reconnaissance against {bred}{target}{rst} finished successfully in {time}", 
+            return info("OSINT reconnaissance against {byellow}{target}{rst} finished successfully in {time}", 
                         target=target, time=calculate_elapsed_time(start_time))
             
         except Exception as e:

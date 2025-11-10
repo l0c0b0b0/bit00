@@ -42,12 +42,14 @@ async def start_run(module, args, targets):  # noqa: RUF029
             for future in as_completed(futures):
                 try:
                     result = future.result()
-                    info('{bgreen}Finished all targets in {elapsed_time}!{rst}', 
-                          elapsed_time=calculate_elapsed_time(start_time))
+                    continue
                 except Exception as e:
                     error(f"Error processing target: {e}")
         except KeyboardInterrupt:
             fail("Interrupted by user")
+    
+    info('{bgreen}Finished all targets in {elapsed_time}!{rst}', 
+                          elapsed_time=calculate_elapsed_time(start_time))
         
     if not args.results:    
         if "osint" in args.module:
@@ -119,11 +121,11 @@ def main() -> None:
     try:
         asyncio.run(start_run(module_path, args, targets))
     except KeyboardInterrupt:
-        print(f"Got keyboard interrupt")
+        error(f"Got keyboard interrupt")
     finally:
         # results write report
         # db_engine.dispose()    
-        print("Exiting...")
+        info("{bgreen}All tasks completed{rst}")
 
 if __name__ == "__main__":
     main()
