@@ -56,13 +56,13 @@ python bit00.py netscan 10.10.10.5 -p full -v
 ### OSINT Tools
 
 ```bash
-sudo apt install spiderfoot dnsrecon fierce cloud_enum asn metagoofil dnsutils
+sudo apt install spiderfoot dnsrecon fierce cloud_enum asn metagoofil dnsutils theharvester
 ```
 
 ### NETSCAN Tools
 
 ```bash
-sudo sudo apt install seclists curl dnsrecon enum4linux feroxbuster gobuster impacket-scripts nbtscan nmap redis-tools smbclient smbmap snmp sslscan sipvicious whatweb cmseek nuclei netexec
+sudo sudo apt install seclists curl dnsrecon enum4linux feroxbuster gobuster impacket-scripts nbtscan nmap redis-tools smbclient smbmap snmp sslscan sipvicious whatweb cmseek nuclei netexec ffuf
 ```
 
 ## 📊 Output
@@ -111,4 +111,4 @@ python bit00.py netscan -L  # List plugins
 ```
 
 > [!NOTE]
-> BIT00 performs reconnaissance only - **NO** exploitation or attacks.
+> BIT00 performs reconnaissance only, **NO** exploitation or attacks.

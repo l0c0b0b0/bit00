@@ -38,7 +38,7 @@ for word in $SEARCH_WORDS; do
 		find "$TEMP_DIR" -type f \\( -name ".env" \\
 			-o -name "*.config" \\
 			-o -name "*.properties" \\
-		       	-o -name "config.*" \\
+		    -o -name "config.*" \\
 			-o -name "*.json" \\
 			-o -name "*.yml" \\
 			-o -name "*.yaml" \\
