@@ -76,7 +76,7 @@ Results are saved in multiple formats:
 ```text
 results/
 ├── results.json          # Structured data (JSON)
-├── results.md            # Human-readable report
+├── results.txt            # Human-readable report
 ├── results.xml           # Machine-readable report
 ├── osint/
 │   └── example.com/
@@ -87,8 +87,11 @@ results/
 │       └── scans/              # Scan results
 └── recon/
     └── 10.10.10.5/
-        ├── logs/               # Scan logs
-        └── scans/              # Port scan results
+        ├── logs/
+        │   ├── commands.log    # All commands executed
+        │   ├── error.log       # Error messages
+        │   └── patterns.log    # Pattern matches
+        └── scans/              # Scan results
 ```
 
 ## 🔧 Verbosity Levels
