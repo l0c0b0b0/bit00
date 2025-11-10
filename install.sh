@@ -1,19 +1,11 @@
 #!/bin/sh
 
 # Bit00 Framework Installer
-# curl -sL https://github.com/l0c0b0b0/bit00/install.sh | sh
+# curl -sL https://raw.githubusercontent.com/l0c0b0b0/bit00/main/install.sh | sh
 
 set -e
 
-# Colors for output
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-NC='\033[0m' # No Color
-
-# Print banner
-echo "${BLUE}"
+# 1. Incoming message
 cat << "EOF"
  ____    _   _      ___     ___  
 | __ )  (_) | |_   / _ \   / _ \ 
@@ -21,261 +13,160 @@ cat << "EOF"
 | |_) | | | | |_  | |_| | | |_| |
 |____/  |_|  \__|  \___/   \___/ 
 EOF
-echo "${NC}"
-echo "${YELLOW}The network reconnaissance tool with multiple modules.${NC}"
-echo "${YELLOW}Maintained as an open source project by @l0c0b0b0${NC}"
-echo "${BLUE}Version : 1.0${NC}"
+echo "The network reconnaissance tool with multiple modules."
+echo "Maintained as an open source project by @l0c0b0b0"
+echo "Version : 1.0"
 echo ""
 
-# Function to check command existence
-check_command() {
+# Function to check command
+check_tool() {
     if command -v "$1" >/dev/null 2>&1; then
-        echo "[+] $1\t ${GREEN}[Ok]${NC}"
+        echo "[+] $1	 [Ok]"
         return 0
     else
-        echo "[+] $1\t ${RED}[Not Found]${NC}"
+        echo "[+] $1	 [Not Found]"
         return 1
     fi
 }
 
-# Function to get user input
-get_input() {
-    prompt="$1"
-    default="$2"
-    echo -n "$prompt "
-    if [ -n "$default" ]; then
-        echo -n "[$default] "
-    fi
-    read response
-    echo "${response:-$default}"
-}
-
-# Function to install_go
-install_go_custom() {
-    echo "${YELLOW}[+] Setting up custom Go installation...${NC}"
-    go_root=$(get_input "Set Go executable path:" "/usr/local/go")
-    go_path=$(get_input "Set Go directory path:" "/opt/go")
-    
-    # Create directories
-    sudo mkdir -p "$go_path"/bin "$go_path"/src "$go_path"/pkg
-    
-    # Detect shell and add to profile
-    if [ -n "$ZSH_VERSION" ]; then
-        shell_profile="$HOME/.zshrc"
-    else
-        shell_profile="$HOME/.bashrc"
-    fi
-    
-    {
-        echo "export GOROOT=$go_root"
-        echo "export GOPATH=$go_path" 
-        echo "export PATH=\$GOROOT/bin:\$GOPATH/bin:\$PATH"
-    } >> "$shell_profile"
-    
-    echo "${GREEN}[+] Added to $shell_profile${NC}"
-    
-    # Source the profile
-    . "$shell_profile"
-    
-    export GOROOT="$go_root"
-    export GOPATH="$go_path"
-    export PATH="$GOROOT/bin:$GOPATH/bin:$PATH"
-}
-
-# Step 2: Check main packages and tools
-echo "${BLUE}[2] Checking main packages and tools:${NC}"
+# 2. Checking main packages and tools
+echo "2. Checking main packages and tools:"
 echo "List all Tools need by the framework and check if are installed:"
+check_tool jq
+check_tool nmap
+check_tool curl
+check_tool go
+check_tool vulnx
 
-tools="jq nmap curl go vulnx"
-missing_tools=""
-
-for tool in $tools; do
-    if ! check_command "$tool"; then
-        missing_tools="$missing_tools $tool"
-    fi
-done
-
-# Ask for confirmation before installation
+# Ask for installation confirmation
 echo ""
-echo "${YELLOW}=================================================${NC}"
-echo "${YELLOW}           INSTALLATION CONFIRMATION            ${NC}"
-echo "${YELLOW}=================================================${NC}"
-echo ""
-echo "The following packages will be installed:"
-echo "  ${BLUE}• Main packages:${NC} git, jq, python3-colorama, python3-tldextract, golang, curl"
-echo "  ${BLUE}• OSINT tools:${NC} spiderfoot, dnsrecon, fierce, cloud-enum, asn, dnsutils, theharvester"
-echo "  ${BLUE}• NETSCAN tools:${NC} seclists, enum4linux, feroxbuster, gobuster, impacket-scripts, nbtscan, nmap, redis-tools, smbclient, smbmap, snmp, sslscan, sipvicious, whatweb, cmseek, nuclei, netexec, ffuf"
-echo "  ${BLUE}• Go tools:${NC} vulnx (as vulnx00)"
-echo "  ${BLUE}• Framework:${NC} Bit00 from GitHub"
-echo ""
-echo "${YELLOW}This will require sudo privileges and may take several minutes.${NC}"
-echo ""
+echo "3. Install Packages and Tools:"
+echo "This will install required packages and tools."
+printf "Do you want to proceed? (Y/n): "
+read confirm_install
 
-# Get user confirmation - using simple read
-echo "Do you want to proceed with the installation? (y/N)"
-echo -n "Enter your choice [y/N]: "
-read user_confirm
-
-# Convert to lowercase for comparison
-user_confirm=$(echo "$user_confirm" | tr '[:upper:]' '[:lower:]')
-
-case "$user_confirm" in
-    y|yes)
-        echo "${GREEN}[+] Proceeding with installation...${NC}"
-        ;;
-    *)
-        echo "${RED}[!] Installation cancelled by user.${NC}"
+case "$confirm_install" in
+    [nN]|[nN][oO])
+        echo "Installation cancelled."
         exit 0
         ;;
+    *)
+        echo "[+] Start installing"
+        echo "[+] Updating OS:"
+        sudo apt update
+        
+        echo "[+] Installing Main packages:"
+        sudo apt install -y git jq python3-colorama python3-tldextract golang curl
+        
+        echo "[+] Installing OSINT Tools:"
+        sudo apt install -y spiderfoot dnsrecon fierce cloud-enum asn dnsutils theharvester
+        
+        echo "[+] Installing NETSCAN Tools:"
+        sudo apt install -y seclists dnsrecon enum4linux feroxbuster gobuster impacket-scripts nbtscan nmap redis-tools smbclient smbmap snmp sslscan sipvicious whatweb cmseek nuclei netexec ffuf
+        ;;
 esac
 
-# Step 3: Install Packages and Tools
+# 4. Config Golang
 echo ""
-echo "${BLUE}[3] Install Packages and Tools:${NC}"
-echo "${GREEN}[+] Start installing${NC}"
+echo "4. Config Golang:"
+echo "Default: GOROOT=/usr/local/go"
+echo "Default: GOPATH=/opt/go"
+printf "Use default Go paths? (Y/n): "
+read go_confirm
 
-# Update OS
-echo "${YELLOW}[+] Updating OS:${NC}"
-sudo apt update
-
-echo "${YELLOW}[+] Installing packages...:${NC}"
-
-# Main packages
-echo "${BLUE}[+] Installing main packages...${NC}"
-sudo apt install -y git jq python3-colorama python3-tldextract golang curl
-
-# OSINT Tools
-echo "${BLUE}[+] Installing OSINT tools...${NC}"
-sudo apt install -y spiderfoot dnsrecon fierce cloud-enum asn dnsutils theharvester
-
-# NETSCAN Tools
-echo "${BLUE}[+] Installing NETSCAN tools...${NC}"
-sudo apt install -y seclists dnsrecon enum4linux feroxbuster gobuster impacket-scripts nbtscan nmap redis-tools smbclient smbmap snmp sslscan sipvicious whatweb cmseek nuclei netexec ffuf
-
-# Step 4: Configure Golang
-echo ""
-echo "${BLUE}[4] Config Golang:${NC}"
-
-# Check if Go is installed
-if ! command -v go >/dev/null 2>&1; then
-    echo "${RED}[!] Go is not installed. Installing...${NC}"
-    sudo apt install -y golang-go
-fi
-
-echo "${YELLOW}Default: GOROOT=/usr/local/go${NC}"
-echo "${YELLOW}Default: GOPATH=/opt/go${NC}"
-
-echo "Use default Go paths? (Y/n)"
-echo -n "Enter your choice [Y/n]: "
-read use_default
-
-use_default=$(echo "$use_default" | tr '[:upper:]' '[:lower:]')
-
-case "$use_default" in
-    n|no)
-        install_go_custom
+case "$go_confirm" in
+    [nN]|[nN][oO])
+        printf "Set Go executable path: "
+        read go_root
+        printf "Set Go directory path: "
+        read go_path
         ;;
     *)
-        # Set default Go paths
-        export GOROOT=/usr/local/go
-        export GOPATH=/opt/go
-        
-        # Create default directory
-        sudo mkdir -p /opt/go/bin /opt/go/src /opt/go/pkg
-        sudo chown -R "$(whoami):$(whoami)" /opt/go
-        
-        # Detect shell and add to profile
-        if [ -n "$ZSH_VERSION" ]; then
-            shell_profile="$HOME/.zshrc"
-        else
-            shell_profile="$HOME/.bashrc"
-        fi
-        
-        {
-            echo "export GOPATH=/opt/go"
-            echo "export PATH=\$GOPATH/bin:\$PATH"
-        } >> "$shell_profile"
-        
-        echo "${GREEN}[+] Added to $shell_profile${NC}"
-        . "$shell_profile"
+        go_root="/usr/local/go"
+        go_path="/opt/go"
         ;;
 esac
 
-# Step 5: Install Vulnx
-echo ""
-echo "${BLUE}[5] Installing Vulnx...${NC}"
-echo "${GREEN}[+] Installing Vulnx in dest: /opt/go/bin/vulnx${NC}"
+# Create Go directories
+sudo mkdir -p "$go_path"/bin "$go_path"/src "$go_path"/pkg
+sudo chown -R "$(id -u):$(id -g)" "$go_path"
 
-# Install vulnx
-"$GOROOT/bin/go" install github.com/projectdiscovery/nuclei/v2/cmd/nuclei@latest
-
-# Create symlink with different name
-echo "${YELLOW}[+] Changing name because there is a tool on github python called vulnx${NC}"
-sudo ln -sf /opt/go/bin/nuclei /usr/local/bin/vulnx00
-
-# Verify installation
-if command -v vulnx00 >/dev/null 2>&1; then
-    echo "${GREEN}[+] Accessible as vulnx00 [Ok]${NC}"
+# Detect shell and update profile
+if [ -n "$ZSH_VERSION" ]; then
+    shell_profile="$HOME/.zshrc"
 else
-    echo "${RED}[!] Failed to install vulnx00${NC}"
-    exit 1
+    shell_profile="$HOME/.bashrc"
 fi
 
-# Step 6: Verify all installations
+# Add Go to shell profile
+{
+    echo "export GOROOT=$go_root"
+    echo "export GOPATH=$go_path"
+    echo "export PATH=\$GOROOT/bin:\$GOPATH/bin:\$PATH"
+} >> "$shell_profile"
+
+# Source the profile
+. "$shell_profile"
+
+export GOROOT="$go_root"
+export GOPATH="$go_path"
+export PATH="$GOROOT/bin:$GOPATH/bin:$PATH"
+
+# 5. Install Vulnx
 echo ""
-echo "${BLUE}[6] Verification checklist:${NC}"
+echo "5. Install Vulnx:"
+printf "Install Vulnx? (Y/n): "
+read vulnx_confirm
 
-final_tools="jq nmap curl go vulnx00 git python3 dnsrecon theharvester feroxbuster nuclei"
-all_ok=true
+case "$vulnx_confirm" in
+    [nN]|[nN][oO])
+        echo "Skipping Vulnx installation."
+        ;;
+    *)
+        echo "[+] Installing Vulnx in dest: $GOPATH/bin/vulnx"
+        go install github.com/projectdiscovery/nuclei/v2/cmd/nuclei@latest
+        
+        echo "[+] Changing name because there is a tool on github python called vulnx"
+        sudo ln -sf "$GOPATH/bin/nuclei" /usr/local/bin/vulnx00
+        echo "Accessible from vulnx00 [Ok]"
+        ;;
+esac
 
-for tool in $final_tools; do
-    if command -v "$tool" >/dev/null 2>&1; then
-        echo "[+] $tool\t ${GREEN}[Ok]${NC}"
-    else
-        echo "[+] $tool\t ${RED}[Not Found]${NC}"
-        all_ok=false
-    fi
-done
-
-if [ "$all_ok" = false ]; then
-    echo "${RED}[!] Some tools failed to install. Please check manually.${NC}"
-    exit 1
+# 6. Verify installation
+echo ""
+echo "6. Verification checklist:"
+echo "Checking if main packages are installed:"
+check_tool jq
+check_tool nmap
+check_tool curl
+check_tool go
+if command -v vulnx00 >/dev/null 2>&1; then
+    echo "[+] vulnx00	 [Ok]"
+else
+    echo "[+] vulnx00	 [Not Found]"
 fi
 
-# Step 7: Download and install Bit00
+# 7. Install Bit00 framework
 echo ""
-echo "${BLUE}[7] Downloading and installing Bit00 framework...${NC}"
-
+echo "7. Installing Bit00 framework:"
 bit00_dir="/opt/bit00"
 
-# Clone repository
+echo "[+] Downloading from https://github.com/l0c0b0b0/Bit00.git"
 sudo git clone https://github.com/l0c0b0b0/Bit00.git "$bit00_dir"
 
-# Set permissions
+echo "[+] Setting permissions to 755"
 sudo chmod -R 755 "$bit00_dir"
 
-# Create symlink
+echo "[+] Creating symlink"
 sudo ln -sf "$bit00_dir/bit00.py" /usr/local/bin/bit00
 
-# Make main script executable
-sudo chmod +x "$bit00_dir/bit00.py"
-
-# Step 8: Installation complete
+# 8. Installation complete
 echo ""
-echo "${GREEN}"
-cat << "EOF"
-╔═══════════════════════════════════════╗
-║        Installation Complete!         ║
-╚═══════════════════════════════════════╝
-EOF
-echo "${NC}"
-
-echo "${GREEN}[+] Bit00 framework installed successfully!${NC}"
-echo "${GREEN}[+] Location: $bit00_dir${NC}"
-echo "${GREEN}[+] Accessible via: bit00${NC}"
+echo "8. Installation finish successfully!!!"
+echo "Bit00 framework installed in: $bit00_dir"
+echo "Accessible via: bit00"
 echo ""
-echo "${YELLOW}Usage:${NC}"
+echo "Usage examples:"
 echo "  bit00 --help"
 echo "  bit00 -t example.com -m osint"
-echo ""
-echo "${BLUE}Thank you for installing Bit00!${NC}"
+echo "  bit00 -t 192.168.1.0/24 -m netscan"
