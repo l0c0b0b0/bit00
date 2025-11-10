@@ -32,11 +32,11 @@ check_tool() {
 # 2. Checking main packages and tools
 echo "2. Checking main packages and tools:"
 echo "List all Tools need by the framework and check if are installed:"
-check_tool jq
-check_tool nmap
-check_tool curl
-check_tool go
-check_tool vulnx
+check_tool jq || true
+check_tool nmap || true
+check_tool curl || true
+check_tool go || true
+check_tool vulnx || true
 
 # Ask for installation confirmation
 echo ""
