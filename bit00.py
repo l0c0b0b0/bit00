@@ -38,14 +38,7 @@ def gen_cli_args() -> argparse.ArgumentParser:
         type=int,
         default=10,
         help="The maximum number of scans to perform per target host. Default: %(default)s"
-        )
-    common_parser.add_argument(
-        "-V", "--version",
-        action="store_true",
-        default="1.0",
-        help="Display version information and exit" 
-        )
-    
+        )    
     parser = argparse.ArgumentParser(
         description=rf"""
  ____    _   _      ___     ___  
