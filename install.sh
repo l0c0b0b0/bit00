@@ -21,10 +21,10 @@ echo ""
 # Function to check command
 check_tool() {
     if command -v "$1" >/dev/null 2>&1; then
-        echo "[+] $1	 [Ok]"
+        echo "[+] $1    \t[Ok]"
         return 0
     else
-        echo "[+] $1	 [Not Found]"
+        echo "[+] $1    \t[Not Found]"
         return 1
     fi
 }
