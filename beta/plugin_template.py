@@ -1,4 +1,4 @@
-"""Scraping Git repositories reconnaissance plugin."""
+"""New Plugin scan plugin."""
 import os
 import asyncio
 from dataclasses import dataclass, field
