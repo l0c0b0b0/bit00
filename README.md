@@ -83,7 +83,7 @@ Results are saved in multiple formats:
 │       │   └── patterns.log    # Pattern matches
 │       └── scans/              # Scan results
 ├── recon/
-|    └── 10.10.10.5/
+│   └── 10.10.10.5/
 │        ├── logs/
 │        │   ├── commands.log    # All commands executed
 │        │   ├── error.log       # Error messages
