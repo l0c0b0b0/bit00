@@ -48,7 +48,7 @@ def gen_cli_args() -> argparse.ArgumentParser:
     
     parser = argparse.ArgumentParser(
         description=rf"""
-     ____    _   _      ___     ___  
+ ____    _   _      ___     ___  
 | __ )  (_) | |_   / _ \   / _ \ 
 |  _ \  | | | __| | | | | | | | |
 | |_) | | | | |_  | |_| | | |_| |
