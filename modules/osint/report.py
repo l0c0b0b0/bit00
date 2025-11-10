@@ -18,7 +18,7 @@ def generate_reports(patterns_log_paths, output_dir):
     for log_path in patterns_log_paths:
         debug(f"Processing OSINT log: {log_path}")
         if not os.path.exists(log_path):
-            print(f"  ✗ Log file not found: {log_path}")
+            error(f"  Log file not found: {log_path}")
             continue
             
         file_size = os.path.getsize(log_path)
@@ -52,7 +52,7 @@ def generate_reports(patterns_log_paths, output_dir):
         return
     
     # Generate reports with merged data
-    generate_osint_markdown(all_osint_data, all_basedomains, output_dir)
+    generate_osint_text(all_osint_data, all_basedomains, output_dir)
     generate_osint_json(all_osint_data, all_basedomains, output_dir)
     generate_osint_xml(all_osint_data, all_basedomains, output_dir)
 
@@ -61,7 +61,7 @@ def _is_duplicate_entry(existing_entries, new_entry):
     for existing_entry in existing_entries:
         if (existing_entry.get('plugin') == new_entry.get('plugin') and 
             existing_entry.get('content') == new_entry.get('content') and
-            existing_entry.get('email') == new_entry.get('email')):
+            existing_entry.get('info') == new_entry.get('info')):
             return True
     return False
 
@@ -133,8 +133,8 @@ class OSINTParser:
             self.basedomains.add(base_domain)
         
         # Process based on description type
-        if desc == 'email':
-            self._process_email(plugin, target, content)
+        if desc == 'info':
+            self._process_info(plugin, target, content)
         elif desc == 'domain2ip':
             self._process_domain2ip(plugin, target, content)
         elif desc == 'dnsenum':
@@ -146,8 +146,8 @@ class OSINTParser:
         elif desc == 'webtech':
             self._process_webtech(plugin, desc, target, content)
 
-    def _process_email(self, plugin, target, content):
-        """Process email entries"""
+    def _process_info(self, plugin, target, content):
+        """Process info entries"""
         # content: "jhonnatan.lacoa@agetic.gob.bo"
         email_match = re.search(r'([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})', content)
         if email_match:
@@ -158,17 +158,26 @@ class OSINTParser:
             if base_domain:
                 entry = {
                     'plugin': plugin,
-                    'email': email,
                     'content': email
                 }
                 # Check for duplicates before adding
-                if not self._is_duplicate_in_list(self.osint_data[base_domain]['email'], entry):
-                    self.osint_data[base_domain]['email'].append(entry)
+                if not self._is_duplicate_in_list(self.osint_data[base_domain]['info'], entry):
+                    self.osint_data[base_domain]['info'].append(entry)
+        
+        base_domain = self._extract_base_domain(target)
+        if content and base_domain:
+            entry = {
+                'plugin': plugin,
+                'content': content
+            }
+            # Check for duplicates before adding
+            if not self._is_duplicate_in_list(self.osint_data[base_domain]['info'], entry):
+                self.osint_data[base_domain]['info'].append(entry)
 
     def _process_domain2ip(self, plugin, target, content):
         """Process domain to IP mapping entries"""
         # content: "190.14.106.3-www.agetic.gob.bo"
-        match = re.search(r'([\d.]+)-([\w.-]+)', content)
+        match = re.search(r'([\d.]+)\s*=>\s*([\w.-]+)', content)
         if match:
             ip, hostname = match.groups()
             
@@ -298,7 +307,7 @@ class OSINTParser:
         for entry in entry_list:
             if (entry.get('plugin') == new_entry.get('plugin') and 
                 entry.get('content') == new_entry.get('content') and
-                entry.get('email') == new_entry.get('email')):
+                entry.get('info') == new_entry.get('info')):
                 return True
         return False
 
@@ -323,22 +332,22 @@ class OSINTParser:
         ip_pattern = r'^\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b$'
         return re.match(ip_pattern, ip) is not None  
     
-def generate_osint_markdown(osint_data, basedomains, output_dir):
-    """Generate OSINT markdown report"""
-    content = ["# OSINT REPORT", ""]
+def generate_osint_text(osint_data, basedomains, output_dir):
+    """Generate OSINT TXT results"""
+    content = ["[*] OSINT Reconnaissance Results", ""]
     
     if not osint_data:
-        content.append("No OSINT data available.")
+        content.append("[-] No OSINT data available.")
     else:
         # Process each base domain
         for basedomain in sorted(basedomains):
-            content.append("# OSINT")
-            content.append(f"BASEDOMAIN: {basedomain}")
+            content.append(f"[*] Target domain: {basedomain}")
+            content.append(f"[*] Base domain: {basedomain}")
             
             # Add email entries for base domain
-            if basedomain in osint_data and 'email' in osint_data[basedomain]:
-                for entry in osint_data[basedomain]['email']:
-                    content.append(f"\t[{entry['plugin']}] email: {entry.get('email', entry.get('content', ''))}")
+            if basedomain in osint_data and 'info' in osint_data[basedomain]:
+                for entry in osint_data[basedomain]['info']:
+                    content.append(f"\t[{entry['plugin']}] info: {entry.get('info', entry.get('content', ''))}")
             
             # Add DNS enumeration entries for base domain
             if basedomain in osint_data and 'dnsenum' in osint_data[basedomain]:
@@ -382,10 +391,10 @@ def generate_osint_markdown(osint_data, basedomains, output_dir):
             
             content.append("")
     
-    output_path = os.path.join(output_dir, "osint.md")
+    output_path = os.path.join(output_dir, "osint.txt")
     with open(output_path, 'w', encoding='utf-8') as f:
         f.write('\n'.join(content))
-    info("OSINT Markdown report generated: {bgreen}{output_path}{rst}")
+    info("OSINT TXT report generated: {bgreen}{output_path}{rst}")
 
 def generate_osint_json(osint_data, basedomains, output_dir):
     """Generate OSINT JSON report"""
@@ -402,7 +411,7 @@ def generate_osint_json(osint_data, basedomains, output_dir):
                 report["OSINT"]["basedomain_data"][basedomain] = {}
                 for data_type, entries in osint_data[basedomain].items():
                     report["OSINT"]["basedomain_data"][basedomain][data_type] = [
-                        {"plugin": entry['plugin'], "content": entry.get('content', entry.get('email', ''))} 
+                        {"plugin": entry['plugin'], "content": entry.get('content', entry.get('info', ''))} 
                         for entry in entries
                     ]
         
@@ -445,7 +454,7 @@ def generate_osint_xml(osint_data, basedomains, output_dir):
                     entry_elem = ET.SubElement(basedata_elem, "entry")
                     ET.SubElement(entry_elem, "type").text = data_type
                     ET.SubElement(entry_elem, "plugin").text = entry['plugin']
-                    ET.SubElement(entry_elem, "content").text = entry.get('content', entry.get('email', ''))
+                    ET.SubElement(entry_elem, "content").text = entry.get('content', entry.get('info', ''))
     
     # Add hosts
     hosts_elem = ET.SubElement(root, "hosts")

@@ -96,7 +96,6 @@ def main() -> None:
                 continue
         
         if targets:
-            print(targets)
             info(f"Total targets to process: {len(targets)}")
         else:
             error("No valid targets found in the provided input")

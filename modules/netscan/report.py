@@ -57,7 +57,7 @@ def generate_reports(patterns_log_paths, output_dir):
     all_netscan_data = remove_duplicates(all_netscan_data)
     
     # Generate reports with merged and deduplicated data
-    generate_netscan_markdown(all_netscan_data, output_dir)
+    generate_netscan_text(all_netscan_data, output_dir)
     generate_netscan_json(all_netscan_data, output_dir)
     generate_netscan_xml(all_netscan_data, output_dir)
 
@@ -224,12 +224,12 @@ class NetScanParser:
         
         return None
 
-def generate_netscan_markdown(netscan_data, output_dir):
-    """Generate NETSCAN markdown report"""
-    content = ["# NETSCAN Report", ""]
+def generate_netscan_text(netscan_data, output_dir):
+    """Generate NETSCAN TXT Results"""
+    content = ["[*] NETSCAN Port Enumeration Results", ""]
     
     if not netscan_data:
-        content.append("No NETSCAN data available.")
+        content.append("[-] No NETSCAN data available.")
     else:
         for ip, data in netscan_data.items():
             ttl = data.get('ttl', 'Unknown')
@@ -239,15 +239,15 @@ def generate_netscan_markdown(netscan_data, output_dir):
             services = data.get('services', [])
             if services:
                 for plugin, context in services:
-                    content.append(f"    [{plugin}] {context}")
+                    content.append(f"\t[{plugin}] {context}")
             else:
-                content.append("    No services found")
+                content.append("\tNo services found")
             content.append("")
     
-    output_path = os.path.join(output_dir, "netscan.md")
+    output_path = os.path.join(output_dir, "netscan.txt")
     with open(output_path, 'w', encoding='utf-8') as f:
         f.write('\n'.join(content))
-    info("NETSCAN Markdown report generated: {bgreen}{output_path}{rst}")
+    info("NETSCAN TXT report generated: {bgreen}{output_path}{rst}")
 
 
 def generate_netscan_json(netscan_data, output_dir):

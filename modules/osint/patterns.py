@@ -37,7 +37,13 @@ PATTERNS = {
             "description": "domain2ip: {match}",
             "pattern": r'^(?P<domain>[a-zA-Z0-9.-]+)(?P<ipaddress>)'
             }
-        ] 
+        ],
+        "TheHarvester": [
+            {
+            "description": "domain2ip: {match}",
+            "pattern": r'^(?P<domain>[a-zA-Z0-9.-]+):(?P<ipaddress>\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})$'
+            }
+        ]
     },
     "revlookup": {
         "AmassRevlookup": [
@@ -47,9 +53,9 @@ PATTERNS = {
             }
         ],
     "SpiderfootRevlookup": [
-        {
-        "description": "revlookup: {match}",
-        "pattern": ".*(,)(?P<ipaddress>\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})(,)(?P<domain>[a-zA-Z0-9.-]+)$"
+            {
+            "description": "revlookup: {match}",
+            "pattern": ".*(,)(?P<ipaddress>\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3})(,)(?P<domain>[a-zA-Z0-9.-]+)$"
         }
         ]
     },
@@ -66,10 +72,22 @@ PATTERNS = {
         ],
         "SpiderfootEmail": [
             {
-            "description": "email: {match}",
+            "description": "info: {match}",
             "pattern": r'[\w.+-]+@[\w-]+\.[\w.-]+'
             }
         ],
+        "TheHarvesterEmail": [
+            {
+            "description": "info: {match}",
+            "pattern": r'[\w.+-]+@[\w-]+\.[\w.-]+'
+            }
+        ],
+        "ScrapingGitHub": [
+            {
+            "description": "info: {match}",
+            "pattern": r'/tmp/GITrepo_[^\s]*.*$'
+            }
+        ]
     },
     "ipnet":{
         "CurlGeolocation": [

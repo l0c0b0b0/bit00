@@ -24,7 +24,7 @@ def mod_args(subparsers, parents) -> argparse.ArgumentParser:
     osint_parser.add_argument('-v', '--verbose', action='count', default=0,
                                 help='Enable verbose output. Repeat for more verbosity.')
     osint_parser.add_argument('-r', '--results', action='store', default=False, dest='results', 
-                              help='Create the report in MarkDown, Json and Xml. Default: It will execute after finish all targets')
+                              help='Create the report in Txt, Json and Xml. Default: It will execute after finish all targets')
     osint_parser.add_argument('--only-scans-dir', action='store_true', default=False, 
                                   help='Only create the "scans" directory for results.')
     return subparsers

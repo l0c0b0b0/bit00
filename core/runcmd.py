@@ -150,10 +150,10 @@ class RegexPatterns:
                 async with LOCK:
                     if _ip not in matches:
                         matches[_ip] = [_xydomain]
-                        log_pattern(output, tag, "domain2ip", f"{_ip}-{_xydomain}")
+                        log_pattern(output, tag, "domain2ip", f"{_ip} => {_xydomain}")
                     elif _xydomain not in matches[_ip]:
                         matches[_ip].append(_xydomain)
-                        log_pattern(output, tag, "domain2ip", f"{_ip}-{_xydomain}")
+                        log_pattern(output, tag, "domain2ip", f"{_ip} => {_xydomain}")
         
         return matches
     

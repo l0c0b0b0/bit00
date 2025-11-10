@@ -71,7 +71,7 @@ class osint:
             return {m: props for m, props in self.loader_plugins().items() if "revlookup" in props["tag"]}
         return {
             m: props for m, props in self.loader_plugins().items() 
-            if "discover" in props["tag"] or m in ['SpiderfootEmail', 'DNSReconRegisters', 'CurlGeolocation']
+            if "discover" in props["tag"] or m in ['SpiderfootEmail', 'DNSReconRegisters', 'CurlGeolocation','ScrapingGitHub','TheHarvesterEmail']
         }
 
     def setup_scan_plugins(self):
