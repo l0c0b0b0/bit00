@@ -1,4 +1,4 @@
-"""DNS reconnaissance plugin."""
+"""DNSRecon reconnaissance DNS plugin."""
 from dataclasses import dataclass, field
 from typing import List, Tuple
 from core.runcmd import runcommand

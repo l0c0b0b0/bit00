@@ -1,4 +1,4 @@
-"""DNS reconnaissance plugin."""
+"""Curl Geolocation reconnaissance plugin."""
 import os
 from dataclasses import dataclass, field
 from typing import List, Tuple

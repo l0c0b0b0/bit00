@@ -1,4 +1,4 @@
-"""DNS reconnaissance plugin."""
+"""Amass Reverse Look UP reconnaissance plugin."""
 from dataclasses import dataclass, field
 from typing import List, Tuple
 from core.runcmd import runcommand

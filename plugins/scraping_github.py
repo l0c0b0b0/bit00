@@ -1,4 +1,4 @@
-"""DNS reconnaissance plugin."""
+"""Scraping Git repositories reconnaissance plugin."""
 import os
 from dataclasses import dataclass, field
 from typing import List, Tuple

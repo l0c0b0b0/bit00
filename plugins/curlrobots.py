@@ -1,4 +1,4 @@
-"""curl-robots scanning plugin."""
+"""Curl Robots scanning plugin."""
 from dataclasses import dataclass, field
 from typing import List, Tuple
 from core.runcmd import runcommand
