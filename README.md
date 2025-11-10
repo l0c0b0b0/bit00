@@ -16,22 +16,22 @@ BIT00 automates OSINT gathering and network scanning to save time on security as
 
 1. **Update your system, install Python required packages:**
 
-```bash
-sudo apt update && sudo apt install python3 python3-pip python3-venv
-```
+    ```bash
+    sudo apt update && sudo apt install python3 python3-pip python3-venv
+    ```
 
 2. **Set up virtual environment:**
 
-```bash
-python3 -m venv .bit00
-source .bit00/bin/activate
-```
+    ```bash
+    python3 -m venv .bit00
+    source .bit00/bin/activate
+    ```
 
-3. **set up virtual environment:**
+3. **Install requirements:**
 
-```bash
-pip install -r requirements.txt
-```
+    ```bash
+    pip install -r requirements.txt
+    ```
 
 ## 📖 Basic Usage
 
@@ -110,4 +110,4 @@ python bit00.py netscan -L  # List plugins
 ```
 
 > [!NOTE]
-> BIT00 performs reconnaissance only - no exploitation or attacks.
+> BIT00 performs reconnaissance only - **NO** exploitation or attacks.
