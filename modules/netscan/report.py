@@ -106,66 +106,86 @@ class NetScanParser:
     def parse_netscan_data(self, patterns_log_path):
         """Parse NETSCAN data from a single patterns.log file"""
         netscan_entries = 0
-        
+    
         try:
             with open(patterns_log_path, 'r', encoding='utf-8', errors='ignore') as f:
                 for line_num, line in enumerate(f, 1):
                     line = line.strip()
                     if not line:
                         continue
-                    
+                
                     # Debug: print first few lines to understand format
                     if line_num <= 3:
                         debug(f"    Line {line_num}: {line}")
-                    
-                    # Parse the actual log format: 
-                    # [*] [20251107:22.48.40]:portscan:NmapTCPTop1000:200.87.125.227:portscan:tcp/143/imap-Dovecot imapd54
-                    
+                
                     # Remove the initial [*] 
                     if line.startswith('[*] '):
                         line = line[4:]  # Remove "[*] "
-                    
-                    # NEW APPROACH: Use regex to extract the components properly
-                    # Format: [timestamp]:phase:plugin:ip:context:service_details
-                    pattern = r'^\[([^\]]+)\]:([^:]+):([^:]+):([^:]+):([^:]+):(.+)$'
+                
+                    # Parse the line
+                    pattern = r'^\[([^\]]+)\]:([^:]+):([^:]+):([^:]+):([^:]+):([^:]+):?(.*)$'
                     match = re.match(pattern, line)
-                    
+                
                     if not match:
                         debug(f"    ✗ Line {line_num} doesn't match expected format")
                         continue
-                    
-                    # Extract components from regex groups
-                    timestamp = match.group(1)  # "20251107:22.48.40"
-                    phase = match.group(2)      # "portscan"
-                    plugin = match.group(3)     # "NmapTCPTop1000"
-                    ip_address = match.group(4) # "200.87.125.227"
-                    context = match.group(5)    # "portscan" or "vuln" or "cve"
-                    service_details = match.group(6) # "tcp/143/imap-Dovecot imapd54"
-                    
-                    debug(f"    Parsed - Phase: '{phase}', Plugin: '{plugin}', IP: '{ip_address}'")
-                    
-                    # Only process NETSCAN phases
+                
+                    # Extract all groups
+                    timestamp = match.group(1)  # "20251109:21.53.15"
+                    phase = match.group(2)      # "portscan" or "scans"
+                    plugin = match.group(3)     # "NmapTCPTop1000" or "NmapHttp"
+                    field4 = match.group(4)
+                    field5 = match.group(5)
+                    field6 = match.group(6)
+                    field7 = match.group(7)     # Will be empty string if not present
+                
+                    # Handle different phases
                     if phase == 'portscan':
+                        # Format: [timestamp]:portscan:plugin:ip:portscan:service_details
+                        ip_address = field4
+                        context = field5
+                        service_details = field6
+                    
                         netscan_entries += 1
                         self._process_netscan_entry(plugin, context, ip_address, service_details)
                         debug(f"    Processed NETSCAN entry #{netscan_entries}")
+                    
+                    elif phase == 'scans':
+                        # Format: [timestamp]:scans:plugin:service:ip:flag:details
+                        service = field4        # "tcp/443/https"
+                        ip_address = field5     # "200.87.125.227"
+                        flag_type = field6      # "vuln" or "cve"
+                        details = field7        # "State: VULNERABLE" or "CVE-2011-3192"
+                    
+                        debug(f"    {flag_type.upper()} Found - Plugin: '{plugin}', IP: '{ip_address}', Service: '{service}'")
+                        debug(f"    {flag_type.upper()} Details: {details}")
+                    
+                        # Store vulnerability information
+                        if ip_address not in self.netscan_data:
+                            self.netscan_data[ip_address] = {'os': 'Unknown', 'ttl': None, 'services': []}
+                    
+                        if flag_type == 'cve':
+                            self.netscan_data[ip_address]['services'].append((plugin, f"CVE: {details}"))
+                        elif flag_type == 'vuln':
+                            self.netscan_data[ip_address]['services'].append((plugin, f"VULN: {details}"))
+
                     else:
-                        debug(f"    Skipping - not portscan phase: '{phase}'")
-            
+                        debug(f"    Skipping - unknown phase: '{phase}'")
+
             debug(f"  Processed {netscan_entries} NETSCAN entries")
-            
+        
         except Exception as e:
             error(f"  Error parsing log file: {e}")
             import traceback
             traceback.print_exc()
-        
+    
         return self.netscan_data
 
     def _process_netscan_entry(self, plugin, context, ip_address, service_details):
         """Process a single NETSCAN entry"""
         # Validate IP address
         if not self._is_valid_ip(ip_address):
-            debug(f"    Invalid IP: {ip_address}")
+            debug(f"\tInvalid IP: {ip_address}")
             return
         
         # Extract TTL from service_details (look for numbers at the end)
@@ -176,6 +196,7 @@ class NetScanParser:
         self.netscan_data[ip_address]['os'] = os_type
         self.netscan_data[ip_address]['ttl'] = ttl
         
+        print(context)
         # Create service description
         if context == 'portscan':
             service_desc = f"portscan:{service_details}"
@@ -186,7 +207,7 @@ class NetScanParser:
         
         self.netscan_data[ip_address]['services'].append((plugin, service_desc))
         
-        debug(f"    Added service for {ip_address}: {plugin} - {service_desc} (TTL: {ttl}, OS: {os_type})")
+        debug(f"\tAdded service for {ip_address}: {plugin} - {service_desc} (TTL: {ttl}, OS: {os_type})")
 
     def _is_valid_ip(self, ip):
         """Check if the string is a valid IP address"""
@@ -228,6 +249,7 @@ def generate_netscan_text(netscan_data, output_dir):
     """Generate NETSCAN TXT Results"""
     content = ["[*] NETSCAN Port Enumeration Results", ""]
     
+    print(netscan_data)
     if not netscan_data:
         content.append("[-] No NETSCAN data available.")
     else:
