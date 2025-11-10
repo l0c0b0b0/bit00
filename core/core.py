@@ -51,7 +51,7 @@ async def start_run(module, args, targets):  # noqa: RUF029
     info('{bgreen}Finished all targets in {elapsed_time}!{rst}', 
                           elapsed_time=calculate_elapsed_time(start_time))
         
-    if not args.results:    
+    if not args.results and not args.list_plugins:    
         if "osint" in args.module:
             osint_loader = ReportsLoader("osint")
             osint_loader.generate_reports()
