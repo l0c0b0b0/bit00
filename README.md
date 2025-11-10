@@ -76,7 +76,7 @@ Results are saved in multiple formats:
 ```text
 results/
 ├── results.json          # Structured data (JSON)
-├── results.txt            # Human-readable report
+├── results.txt           # Human-readable report
 ├── results.xml           # Machine-readable report
 ├── osint/
 │   └── example.com/
