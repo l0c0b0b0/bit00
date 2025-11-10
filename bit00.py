@@ -8,7 +8,7 @@ from pathlib import Path
 from loaders.modulesloaders import ModulesLoader
 
 
-VERSION = "2.0"
+VERSION = "1.0"
 
 # Add project root to path
 project_root = Path(__file__).parent
@@ -57,7 +57,7 @@ def gen_cli_args() -> argparse.ArgumentParser:
 The network reconnaissance tool with multiple modules.
 Maintained as an open source project by @l0c0b0b0
 
-Version : 2.0
+Version : {VERSION}
 """,    formatter_class=argparse.RawTextHelpFormatter,
             parents=[common_parser]
         )
