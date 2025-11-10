@@ -41,10 +41,12 @@ check_command() {
 # Function to install_go
 install_go_custom() {
     echo -e "${YELLOW}[+] Setting up custom Go installation...${NC}"
-    read -p "Set Go executable path (default: /usr/local/go): " go_root
+    echo -n "Set Go executable path (default: /usr/local/go): "
+    read go_root
     go_root=${go_root:-/usr/local/go}
     
-    read -p "Set Go directory path (default: /opt/go): " go_path
+    echo -n "Set Go directory path (default: /opt/go): "
+    read go_path
     go_path=${go_path:-/opt/go}
     
     # Create directories
@@ -76,7 +78,7 @@ install_go_custom() {
 echo -e "${BLUE}[2] Checking main packages and tools:${NC}"
 echo "List all Tools need by the framework and check if are installed:"
 
-tools=("jq" "go" "git" "python3-colorama python3-tldextract" "curl" "seclists" "dnsrecon" "enum4linux" "feroxbuster" "gobuster" "impacket-scripts" "nbtscan" "nmap" "redis-tools" "smbclient" "smbmap" "snmp" "sslscan" "sipvicious" "whatweb" "cmseek" "nuclei" "netexec" "ffuf" "spiderfoot" "dnsrecon" "fierce" "cloud-enum" "asn" "dnsutils" "theharvester")
+tools=("jq" "nmap" "curl" "go" "vulnx")
 missing_tools=()
 
 for tool in "${tools[@]}"; do
@@ -85,7 +87,36 @@ for tool in "${tools[@]}"; do
     fi
 done
 
-read -p "Do you want to procced the installation? (Y/n): " use_default
+# Ask for confirmation before installation
+echo ""
+echo -e "${YELLOW}=================================================${NC}"
+echo -e "${YELLOW}           INSTALLATION CONFIRMATION            ${NC}"
+echo -e "${YELLOW}=================================================${NC}"
+echo ""
+echo -e "The following packages will be installed:"
+echo -e "  ${BLUE}• Main packages:${NC} git, jq, python3-colorama, python3-tldextract, golang, curl"
+echo -e "  ${BLUE}• OSINT tools:${NC} spiderfoot, dnsrecon, fierce, cloud-enum, asn, dnsutils, theharvester"
+echo -e "  ${BLUE}• NETSCAN tools:${NC} seclists, enum4linux, feroxbuster, gobuster, impacket-scripts, nbtscan, nmap, redis-tools, smbclient, smbmap, snmp, sslscan, sipvicious, whatweb, cmseek, nuclei, netexec, ffuf"
+echo -e "  ${BLUE}• Go tools:${NC} vulnx (as vulnx00)"
+echo -e "  ${BLUE}• Framework:${NC} Bit00 from GitHub"
+echo ""
+echo -e "${YELLOW}This will require sudo privileges and may take several minutes.${NC}"
+echo ""
+
+# Get user confirmation
+echo -n "Do you want to proceed with the installation? (Y/n): "
+read user_confirm
+
+case "$user_confirm" in
+    [nN]|[nN][oO])
+        echo -e "${RED}[!] Installation cancelled by user.${NC}"
+        exit 0
+        ;;
+    *)
+        echo -e "${GREEN}[+] Proceeding with installation...${NC}"
+        ;;
+esac
+
 # Step 3: Install Packages and Tools
 echo ""
 echo -e "${BLUE}[3] Install Packages and Tools:${NC}"
@@ -99,7 +130,7 @@ echo -e "${YELLOW}[+] Installing packages...:${NC}"
 
 # Main packages
 echo -e "${BLUE}[+] Installing main packages...${NC}"
-sudo apt install git jq python3-colorama python3-tldextract curl -y
+sudo apt install git jq python3-colorama python3-tldextract golang curl -y
 
 # OSINT Tools
 echo -e "${BLUE}[+] Installing OSINT tools...${NC}"
@@ -122,7 +153,9 @@ fi
 echo -e "${YELLOW}Default: GOROOT=/usr/local/go${NC}"
 echo -e "${YELLOW}Default: GOPATH=/opt/go${NC}"
 
-read -p "Use default Go paths? (Y/n): " use_default
+echo -n "Use default Go paths? (Y/n): "
+read use_default
+
 case "$use_default" in
     [nN]|[nN][oO])
         install_go_custom
@@ -159,11 +192,11 @@ echo -e "${BLUE}[5] Installing Vulnx...${NC}"
 echo -e "${GREEN}[+] Installing Vulnx in dest: /opt/go/bin/vulnx${NC}"
 
 # Install vulnx
-go install github.com/projectdiscovery/cvemap/cmd/vulnx@latest
+go install github.com/projectdiscovery/nuclei/v2/cmd/nuclei@latest
 
 # Create symlink with different name
 echo -e "${YELLOW}[+] Changing name because there is a tool on github python called vulnx${NC}"
-sudo ln -sf /opt/go/bin/vulnx /usr/local/bin/vulnx00
+sudo ln -sf /opt/go/bin/nuclei /usr/local/bin/vulnx00
 
 # Verify installation
 if command -v vulnx00 &> /dev/null; then
@@ -177,7 +210,7 @@ fi
 echo ""
 echo -e "${BLUE}[6] Verification checklist:${NC}"
 
-final_tools=("jq" "go" "git" "python3-colorama python3-tldextract" "curl" "seclists" "dnsrecon" "enum4linux" "feroxbuster" "gobuster" "impacket-scripts" "nbtscan" "nmap" "redis-tools" "smbclient" "smbmap" "snmp" "sslscan" "sipvicious" "whatweb" "cmseek" "nuclei" "netexec" "ffuf" "spiderfoot" "dnsrecon" "fierce" "cloud-enum" "asn" "dnsutils" "theharvester")
+final_tools=("jq" "nmap" "curl" "go" "vulnx00" "git" "python3" "dnsrecon" "theharvester" "feroxbuster" "nuclei")
 all_ok=true
 
 for tool in "${final_tools[@]}"; do
