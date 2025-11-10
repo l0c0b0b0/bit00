@@ -17,7 +17,7 @@ BIT00 automates OSINT gathering and network scanning to save time on security as
 1. **Update your system, install Python required packages:**
 
     ```bash
-    sudo apt update && sudo apt install python3 python3-pip python3-venv
+    sudo apt update && sudo apt install jq git python3 python3-pip python3-venv
     ```
 
 2. **Set up virtual environment:**
