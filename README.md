@@ -74,10 +74,7 @@ Results are saved in multiple formats:
 - results.xml - Standard format
 
 ```text
-results/
-├── results.json          # Structured data (JSON)
-├── results.txt           # Human-readable report
-├── results.xml           # Machine-readable report
+~$ 
 ├── osint/
 │   └── example.com/
 │       ├── logs/
@@ -85,13 +82,17 @@ results/
 │       │   ├── error.log       # Error messages
 │       │   └── patterns.log    # Pattern matches
 │       └── scans/              # Scan results
-└── recon/
-    └── 10.10.10.5/
-        ├── logs/
-        │   ├── commands.log    # All commands executed
-        │   ├── error.log       # Error messages
-        │   └── patterns.log    # Pattern matches
-        └── scans/              # Scan results
+├── recon/
+|    └── 10.10.10.5/
+|        ├── logs/
+|        │   ├── commands.log    # All commands executed
+|        │   ├── error.log       # Error messages
+|        │   └── patterns.log    # Pattern matches
+|        └── scans/              # Scan results
+└──results/
+    ├── results.json          # Structured data (JSON)
+    ├── results.txt           # Human-readable report
+    └── results.xml           # Machine-readable report
 ```
 
 ## 🔧 Verbosity Levels
