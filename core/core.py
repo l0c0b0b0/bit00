@@ -48,7 +48,7 @@ async def start_run(module, args, targets):  # noqa: RUF029
         except KeyboardInterrupt:
             fail("Interrupted by user")
         
-    if not args.results and not args.list_plugins:
+    if not args.results and not args.list_plugins and args.targets:
         info('{bgreen}Finished all targets in {elapsed_time}!{rst}', 
                           elapsed_time=calculate_elapsed_time(start_time))    
         if "osint" in args.module:

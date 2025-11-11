@@ -43,9 +43,9 @@ class ModulesLoader:
                 
                 module_args_path = path_join(modu_path, module_name , "mod_args.py")
             
-            if exists(module_args_path):
-                modules[module_name] = {
-                    "path": module_dir,
-                    "argspath": module_args_path
-                }
+                if exists(module_args_path):
+                    modules[module_name] = {
+                        "path": module_dir,
+                        "argspath": module_args_path
+                    }
         return modules
