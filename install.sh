@@ -21,14 +21,15 @@ echo ""
 
 # Function to check command
 check_tool() {
-    if command -v "$1" >/dev/null 2>&1; then
-        echo "[+] $1    \t[Ok]"
+    if /usr/bin/dpkg -s "$1" 2>/dev/null | grep -q "Status: install ok installed"; then
+        printf "[+] %-12s [Ok]\n" "$1"
         return 0
     else
-        echo "[+] $1    \t[Not Found]"
+        printf "[+] %-12s [Not Found]\n" "$1"
         return 1
     fi
 }
+
 
 # 2. Checking main packages and tools
 echo "2. Checking main packages and tools:"
@@ -43,8 +44,7 @@ check_tool spiderfoot || true
 check_tool dnsrecon || true
 check_tool fierce || true
 check_tool cloud-enum || true
-check_tool asn || true
-check_tool dnsutils || true
+check_tool asn || true 
 check_tool theharvester || true
 check_tool seclists || true
 check_tool dnsrecon || true
@@ -87,7 +87,7 @@ case "$confirm_install" in
         /usr/bin/sudo apt install -y git jq python3-colorama python3-tldextract golang curl
         
         echo "[+] Installing OSINT Tools:"
-        /usr/bin/sudo apt install -y spiderfoot dnsrecon fierce cloud-enum asn dnsutils theharvester
+        /usr/bin/sudo apt install -y spiderfoot dnsrecon fierce cloud-enum asn theharvester
         
         echo "[+] Installing NETSCAN Tools:"
         /usr/bin/sudo apt install -y seclists dnsrecon enum4linux feroxbuster gobuster impacket-scripts nbtscan nmap redis-tools smbclient smbmap snmp sslscan sipvicious whatweb cmseek nuclei netexec ffuf
