@@ -176,7 +176,7 @@ echo "7. Installing Bit00 framework:"
 bit00_dir="/opt/bit00"
 
 echo "[+] Downloading from https://github.com/l0c0b0b0/Bit00.git"
-sudo git clone https://github.com/l0c0b0b0/Bit00.git "$bit00_dir"
+/usr/bin/sudo git clone https://github.com/l0c0b0b0/Bit00.git "$bit00_dir"
 
 echo "[+] Setting permissions to 755"
 /usr/bin/sudo chmod -R 755 "$bit00_dir"
