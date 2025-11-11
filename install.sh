@@ -3,6 +3,7 @@
 # Bit00 Framework Installer
 # curl -sL https://raw.githubusercontent.com/l0c0b0b0/bit00/main/install.sh | sh
 
+
 set -e
 
 # 1. Incoming message
@@ -32,11 +33,38 @@ check_tool() {
 # 2. Checking main packages and tools
 echo "2. Checking main packages and tools:"
 echo "List all Tools need by the framework and check if are installed:"
+check_tool git || true
 check_tool jq || true
-check_tool nmap || true
+check_tool python3-colorama || true
+check_tool python3-tldextract || true
+check_tool golang || true
 check_tool curl || true
-check_tool go || true
-check_tool vulnx || true
+check_tool spiderfoot || true
+check_tool dnsrecon || true
+check_tool fierce || true
+check_tool cloud-enum || true
+check_tool asn || true
+check_tool dnsutils || true
+check_tool theharvester || true
+check_tool seclists || true
+check_tool dnsrecon || true
+check_tool enum4linux || true
+check_tool feroxbuster || true
+check_tool gobuster || true
+check_tool impacket-scripts || true
+check_tool nbtscan || true
+check_tool nmap || true
+check_tool redis-tools || true
+check_tool smbclient || true
+check_tool smbmap || true
+check_tool snmp || true
+check_tool sslscan || true
+check_tool sipvicious || true
+check_tool whatweb || true
+check_tool cmseek || true
+check_tool nuclei || true
+check_tool netexec || true
+check_tool ffuf || true
 
 # Ask for installation confirmation
 echo ""
@@ -53,43 +81,43 @@ case "$confirm_install" in
     *)
         echo "[+] Start installing"
         echo "[+] Updating OS:"
-        sudo apt update
+        /usr/bin/sudo apt update
         
         echo "[+] Installing Main packages:"
-        sudo apt install -y git jq python3-colorama python3-tldextract golang curl
+        /usr/bin/sudo apt install -y git jq python3-colorama python3-tldextract golang curl
         
         echo "[+] Installing OSINT Tools:"
-        sudo apt install -y spiderfoot dnsrecon fierce cloud-enum asn dnsutils theharvester
+        /usr/bin/sudo apt install -y spiderfoot dnsrecon fierce cloud-enum asn dnsutils theharvester
         
         echo "[+] Installing NETSCAN Tools:"
-        sudo apt install -y seclists dnsrecon enum4linux feroxbuster gobuster impacket-scripts nbtscan nmap redis-tools smbclient smbmap snmp sslscan sipvicious whatweb cmseek nuclei netexec ffuf
+        /usr/bin/sudo apt install -y seclists dnsrecon enum4linux feroxbuster gobuster impacket-scripts nbtscan nmap redis-tools smbclient smbmap snmp sslscan sipvicious whatweb cmseek nuclei netexec ffuf
         ;;
 esac
 
 # 4. Config Golang
 echo ""
 echo "4. Config Golang:"
-echo "Default: GOROOT=/usr/local/go"
+#echo "Default: GOROOT=/usr/bin/go"
 echo "Default: GOPATH=/opt/go"
 printf "Use default Go paths? (Y/n): "
 read go_confirm
 
 case "$go_confirm" in
     [nN]|[nN][oO])
-        printf "Set Go executable path: "
-        read go_root
+        #printf "Set Go executable path: "
+        #read go_root
         printf "Set Go directory path: "
         read go_path
         ;;
     *)
-        go_root="/usr/local/go"
+        #go_root="/usr/bin/go"
         go_path="/opt/go"
         ;;
 esac
 
 # Create Go directories
-sudo mkdir -p "$go_path"/bin "$go_path"/src "$go_path"/pkg
-sudo chown -R "$(id -u):$(id -g)" "$go_path"
+/usr/bin/sudo mkdir -p "$go_path"/bin "$go_path"/src "$go_path"/pkg
+/usr/bin/sudo chown -R "$(id -u):$(id -g)" "$go_path"
 
 # Detect shell and update profile
 if [ -n "$ZSH_VERSION" ]; then
@@ -100,17 +128,17 @@ fi
 
 # Add Go to shell profile
 {
-    echo "export GOROOT=$go_root"
+    #echo "export GOROOT=$go_root"
     echo "export GOPATH=$go_path"
-    echo "export PATH=\$GOROOT/bin:\$GOPATH/bin:\$PATH"
+    echo "export PATH=\$PATH:\$GOPATH/bin"
 } >> "$shell_profile"
 
 # Source the profile
 . "$shell_profile"
 
-export GOROOT="$go_root"
+#export GOROOT="$go_root"
 export GOPATH="$go_path"
-export PATH="$GOROOT/bin:$GOPATH/bin:$PATH"
+export PATH="\$PATH:\$GOPATH/bin"
 
 # 5. Install Vulnx
 echo ""
@@ -124,10 +152,10 @@ case "$vulnx_confirm" in
         ;;
     *)
         echo "[+] Installing Vulnx in dest: $GOPATH/bin/vulnx"
-        go install github.com/projectdiscovery/nuclei/v2/cmd/nuclei@latest
+        /usr/bin/go install github.com/projectdiscovery/cvemap/cmd/vulnx@latest
         
         echo "[+] Changing name because there is a tool on github python called vulnx"
-        sudo ln -sf "$GOPATH/bin/nuclei" /usr/local/bin/vulnx00
+        /usr/bin/sudo ln -sf "$GOPATH/bin/vulnx" /usr/local/bin/vulnx00
         echo "Accessible from vulnx00 [Ok]"
         ;;
 esac
@@ -136,10 +164,6 @@ esac
 echo ""
 echo "6. Verification checklist:"
 echo "Checking if main packages are installed:"
-check_tool jq
-check_tool nmap
-check_tool curl
-check_tool go
 if command -v vulnx00 >/dev/null 2>&1; then
     echo "[+] vulnx00	 [Ok]"
 else
@@ -155,12 +179,13 @@ echo "[+] Downloading from https://github.com/l0c0b0b0/Bit00.git"
 sudo git clone https://github.com/l0c0b0b0/Bit00.git "$bit00_dir"
 
 echo "[+] Setting permissions to 755"
-sudo chmod -R 755 "$bit00_dir"
+/usr/bin/sudo chmod -R 755 "$bit00_dir"
 
 echo "[+] Creating symlink"
-sudo ln -sf "$bit00_dir/bit00.py" /usr/local/bin/bit00
+/usr/bin/sudo ln -sf "$bit00_dir/bit00.py" /usr/local/bin/bit00
 
 # 8. Installation complete
+
 echo ""
 echo "8. Installation finish successfully!!!"
 echo "Bit00 framework installed in: $bit00_dir"
