@@ -1,10 +1,19 @@
 #!/bin/sh
 
 # Bit00 Framework Installer
-# curl -sL https://raw.githubusercontent.com/l0c0b0b0/bit00/main/install.sh | sh
-
+# Download first: curl -sL https://raw.githubusercontent.com/l0c0b0b0/bit00/main/install.sh -o install.sh
+# Then run: sh install.sh
 
 set -e
+
+# Check if running in pipe mode (non-interactive)
+if [ ! -t 0 ]; then
+    echo "ERROR: This script requires interactive input."
+    echo "Please download and run manually:"
+    echo "  curl -sL https://raw.githubusercontent.com/l0c0b0b0/bit00/main/install.sh -o install.sh"
+    echo "  sh install.sh"
+    exit 1
+fi
 
 # 1. Incoming message
 cat << "EOF"
@@ -30,6 +39,25 @@ check_tool() {
     fi
 }
 
+# Function to get user input with default
+get_input() {
+    prompt="$1"
+    default="$2"
+    
+    while true; do
+        echo "$prompt"
+        printf "[%s]: " "$default"
+        read response
+        response=$(echo "$response" | tr '[:upper:]' '[:lower:]')
+        if [ -n "$response" ]; then
+            echo "$response"
+            break
+        elif [ -n "$default" ]; then
+            echo "$default"
+            break
+        fi
+    done
+}
 
 # 2. Checking main packages and tools
 echo "2. Checking main packages and tools:"
@@ -47,7 +75,6 @@ check_tool cloud-enum || true
 check_tool asn || true 
 check_tool theharvester || true
 check_tool seclists || true
-check_tool dnsrecon || true
 check_tool enum4linux || true
 check_tool feroxbuster || true
 check_tool gobuster || true
@@ -70,8 +97,7 @@ check_tool ffuf || true
 echo ""
 echo "3. Install Packages and Tools:"
 echo "This will install required packages and tools."
-printf "Do you want to proceed? (Y/n): "
-read confirm_install
+confirm_install=$(get_input "Do you want to proceed? (Y/n)" "y")
 
 case "$confirm_install" in
     [nN]|[nN][oO])
@@ -97,20 +123,14 @@ esac
 # 4. Config Golang
 echo ""
 echo "4. Config Golang:"
-#echo "Default: GOROOT=/usr/bin/go"
 echo "Default: GOPATH=/opt/go"
-printf "Use default Go paths? (Y/n): "
-read go_confirm
+go_confirm=$(get_input "Use default Go paths? (Y/n)" "y")
 
 case "$go_confirm" in
     [nN]|[nN][oO])
-        #printf "Set Go executable path: "
-        #read go_root
-        printf "Set Go directory path: "
-        read go_path
+        go_path=$(get_input "Set Go directory path" "/opt/go")
         ;;
     *)
-        #go_root="/usr/bin/go"
         go_path="/opt/go"
         ;;
 esac
@@ -127,24 +147,26 @@ else
 fi
 
 # Add Go to shell profile
-{
-    #echo "export GOROOT=$go_root"
-    echo "export GOPATH=$go_path"
-    echo "export PATH=\$PATH:\$GOPATH/bin"
-} >> "$shell_profile"
+if ! grep -q "GOPATH=$go_path" "$shell_profile" 2>/dev/null; then
+    {
+        echo ""
+        echo "# Go paths"
+        echo "export GOPATH=$go_path"
+        echo "export PATH=\$PATH:\$GOPATH/bin"
+    } >> "$shell_profile"
+    echo "[+] Added Go paths to $shell_profile"
+fi
 
 # Source the profile
 . "$shell_profile"
 
-#export GOROOT="$go_root"
 export GOPATH="$go_path"
-export PATH="\$PATH:\$GOPATH/bin"
+export PATH="$PATH:$GOPATH/bin"
 
 # 5. Install Vulnx
 echo ""
 echo "5. Install Vulnx:"
-printf "Install Vulnx? (Y/n): "
-read vulnx_confirm
+vulnx_confirm=$(get_input "Install Vulnx? (Y/n)" "y")
 
 case "$vulnx_confirm" in
     [nN]|[nN][oO])
@@ -175,17 +197,32 @@ echo ""
 echo "7. Installing Bit00 framework:"
 bit00_dir="/opt/bit00"
 
-echo "[+] Downloading from https://github.com/l0c0b0b0/Bit00.git"
-/usr/bin/sudo git clone https://github.com/l0c0b0b0/Bit00.git "$bit00_dir"
+if [ -d "$bit00_dir" ]; then
+    echo "[+] Bit00 already exists at $bit00_dir"
+    reinstall=$(get_input "Do you want to reinstall? (y/N)" "n")
+    case "$reinstall" in
+        [yY]|[yY][eE][sS])
+            echo "[+] Removing existing installation"
+            /usr/bin/sudo rm -rf "$bit00_dir"
+            ;;
+        *)
+            echo "[+] Using existing installation"
+            ;;
+    esac
+fi
 
-echo "[+] Setting permissions to 755"
-/usr/bin/sudo chmod -R 755 "$bit00_dir"
+if [ ! -d "$bit00_dir" ]; then
+    echo "[+] Downloading from https://github.com/l0c0b0b0/Bit00.git"
+    /usr/bin/sudo git clone https://github.com/l0c0b0b0/Bit00.git "$bit00_dir"
+    
+    echo "[+] Setting permissions to 755"
+    /usr/bin/sudo chmod -R 755 "$bit00_dir"
+fi
 
 echo "[+] Creating symlink"
 /usr/bin/sudo ln -sf "$bit00_dir/bit00.py" /usr/local/bin/bit00
 
 # 8. Installation complete
-
 echo ""
 echo "8. Installation finish successfully!!!"
 echo "Bit00 framework installed in: $bit00_dir"
@@ -195,3 +232,5 @@ echo "Usage examples:"
 echo "  bit00 --help"
 echo "  bit00 -t example.com -m osint"
 echo "  bit00 -t 192.168.1.0/24 -m netscan"
+echo ""
+echo "Please restart your terminal or run: source $shell_profile"
