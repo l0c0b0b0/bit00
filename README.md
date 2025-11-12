@@ -23,7 +23,7 @@ BIT00 automates OSINT gathering and network scanning to save time on security as
 2. **Install:**
 
     ```bash
-    ~$ sudo ./install.sh
+    sudo ./install.sh
     ```
 
 ## 📖 Basic Usage
@@ -33,15 +33,15 @@ Gather intelligence about domains and organizations.
 **OSINT Basic usage:**
 
 ```bash
-python bit00.py osint example.com
-python bit00.py osint company.com -v -ct 3
+sudo bit00 osint example.com
+sudo bit00 osint company.com -v -ct 3
 ```
 
 **NetScan Basic usage:**
 
 ```bash
-python bit00.py netscan 192.168.1.0/24
-python bit00.py netscan 10.10.10.5 -p full -v
+sudo bit00 netscan 192.168.1.0/24
+sudo bit00 netscan 10.10.10.5 -p full -v
 ```
 
 ## 🛠️ Required Tools
