@@ -40,9 +40,9 @@ class netscan:
     def setup_plugins(self, profile):
         if profile == 'full':
             return {m: props for m, props in self.loader_plugins().items() 
-                    if m in ['MasscanFull', 'NmapTCPFull']}
+                    if m in ['MasscanFull', 'NmapTCPFull', 'Nuclei']}
         return {m: props for m, props in self.loader_plugins().items() 
-                    if m in ['MasscanTop1000', 'NmapTCPTop1000']}
+                    if m in ['MasscanTop1000', 'NmapTCPTop1000', 'Nuclei']}
     
     def get_plugin(self, plugin_name):
         plugins = self.loader_plugins()

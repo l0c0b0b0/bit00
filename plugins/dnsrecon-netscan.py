@@ -8,14 +8,14 @@ class DNSReconRegisters:
     """DNS enumeration using dnsrecon."""
     name: str = "DNSReconRegisters"
     description: str = "DNS reconnaissance."
-    tag: List[str] = field(default_factory=lambda: ["ipnet", "DNSReconRegisters"])
-    supported_modules: List[str] = field(default_factory=lambda: ["osint"])
+    tag: List[str] = field(default_factory=lambda: ["scans", "DNSReconRegisters"])
+    supported_modules: List[str] = field(default_factory=lambda: ["netscan"])
     services_matches: Tuple[str, ...] = field(default=('^domain',))
     run_once: bool = True
 
     
-    async def run(target, tag, output, module):
+    async def run(target, tag, output, service, protocol, port, module):
 
-        cmd  = f"/usr/bin/dnsrecon -a -b -d {target} -c {output}/scans/recon/revdns_dnsrecon_{target}.csv"
+        cmd  = f"/usr/bin/dnsrecon -a -b -d {target} -c {output}/scans/{protocol}_{port}_{service}_dnsrecon.csv"
 
         return await runcommand(cmd=cmd, tag=tag, output=output, module=module)

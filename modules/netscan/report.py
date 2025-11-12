@@ -31,7 +31,7 @@ def generate_reports(patterns_log_paths, output_dir):
             
         # Merge data from all logs
         for ip, data in netscan_data.items():
-            debug(f"  Found IP: {ip} with {len(data.get('services', []))} services")
+            debug(f"  Found target: {ip} with {len(data.get('services', []))} services")
             
             # Only update OS/TTL if not already set or if we have better info
             if 'os' not in all_netscan_data[ip] or all_netscan_data[ip]['os'] == 'Unknown':
@@ -94,7 +94,7 @@ def remove_duplicates(netscan_data):
         original_count = len(data.get('services', []))
         unique_count = len(unique_services)
         if original_count != unique_count:
-            debug(f"  IP {ip}: {original_count} -> {unique_count} services (removed {original_count - unique_count} duplicates)")
+            debug(f"  Target {ip}: {original_count} -> {unique_count} services (removed {original_count - unique_count} duplicates)")
     
     debug(f"Removed {duplicate_count} duplicate services total")
     return deduplicated_data
@@ -157,7 +157,7 @@ class NetScanParser:
                         flag_type = field6      # "vuln" or "cve"
                         details = field7        # "State: VULNERABLE" or "CVE-2011-3192"
                     
-                        debug(f"    {flag_type.upper()} Found - Plugin: '{plugin}', IP: '{ip_address}', Service: '{service}'")
+                        debug(f"    {flag_type.upper()} Found - Plugin: '{plugin}', Target: '{ip_address}', Service: '{service}'")
                         debug(f"    {flag_type.upper()} Details: {details}")
                     
                         # Store vulnerability information
@@ -168,6 +168,8 @@ class NetScanParser:
                             self.netscan_data[ip_address]['services'].append((plugin, f"CVE: {details}"))
                         elif flag_type == 'vuln':
                             self.netscan_data[ip_address]['services'].append((plugin, f"VULN: {details}"))
+                        elif flag_type == 'tech':
+                            self.netscan_data[ip_address]['services'].append((plugin, f"TECH: {details}"))
 
                     else:
                         debug(f"    Skipping - unknown phase: '{phase}'")
@@ -184,23 +186,26 @@ class NetScanParser:
     def _process_netscan_entry(self, plugin, context, ip_address, service_details):
         """Process a single NETSCAN entry"""
         # Validate IP address
-        if not self._is_valid_ip(ip_address):
-            debug(f"\tInvalid IP: {ip_address}")
+        #if not self._is_valid_ip(ip_address):
+        #    debug(f"\tInvalid IP: {ip_address}")
+        #    return
+        if not self._is_valid_target(ip_address):
+            debug(f"\tInvalid target: {ip_address}")
             return
-        
+
         # Extract TTL from service_details (look for numbers at the end)
         ttl = self._extract_ttl(service_details)
         os_type = "Linux" if ttl and ttl < 64 else "Windows" if ttl else "Unknown"
         
+        print(ttl)
         # Store the data
         self.netscan_data[ip_address]['os'] = os_type
         self.netscan_data[ip_address]['ttl'] = ttl
-        
-        print(context)
+
         # Create service description
         if context == 'portscan':
             service_desc = f"portscan:{service_details}"
-        elif context in ['vuln', 'cve']:
+        elif context in ['vuln', 'cve', 'tech']:
             service_desc = f"{context}:{service_details}"
         else:
             service_desc = f"{context}:{service_details}"
@@ -214,42 +219,47 @@ class NetScanParser:
         ip_pattern = r'^\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b$'
         return re.match(ip_pattern, ip) is not None
 
+    def _is_valid_domain(self, domain):
+        """Check if the address is a valid domain name."""
+        if not domain or len(domain) > 253:
+            return False
+        
+        # Basic domain pattern validation
+        domain_pattern = r'^[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(\.[a-zA-Z0-9]([a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$'
+        return bool(re.match(domain_pattern, domain))
+    
+    def _is_valid_target(self, address):
+        """Check if the address is a valid IP or domain."""
+        return self._is_valid_ip(address) or self._is_valid_domain(address)
+
     def _extract_ttl(self, service_details):
         """Extract TTL value from service details"""
-        # Look for 2-digit numbers at the end of the string
-        # Example: "tcp/143/imap-Dovecot imapd54" -> extract 54
-        if service_details and len(service_details) >= 2:
-            last_two = service_details[-2:]
-            if last_two.isdigit():
-                try:
-                    ttl = int(last_two)
-                    # TTL should be between 1 and 255
-                    if 1 <= ttl <= 255:
-                        return ttl
-                except ValueError:
-                    pass
-        
-        # Also try to find TTL in the text
+        if not service_details:
+            return None
+    
+        # Priority 1: TTL in parentheses (most common in nmap output)
         ttl_patterns = [
-            r'ttl[=\s:]*(\d+)',
-            r'TTL[=\s:]*(\d+)',
+            r'\((\d{1,3})\)\s*$',    # Numbers in parentheses at end
+            r'\bttl[=\s:]*(\d+)',    # ttl=64, ttl: 128
+            r'\bTTL[=\s:]*(\d+)',    # TTL=64, TTL: 128
         ]
-        
+    
         for pattern in ttl_patterns:
             match = re.search(pattern, service_details, re.IGNORECASE)
             if match:
                 try:
-                    return int(match.group(1))
+                    ttl = int(match.group(1))
+                    if 1 <= ttl <= 255:
+                        return ttl
                 except ValueError:
                     continue
-        
+    
         return None
 
 def generate_netscan_text(netscan_data, output_dir):
     """Generate NETSCAN TXT Results"""
-    content = ["[*] NETSCAN Port Enumeration Results", ""]
-    
-    print(netscan_data)
+    content = ["[*] NETSCAN Port Enumeration Results", ""]    
+
     if not netscan_data:
         content.append("[-] No NETSCAN data available.")
     else:

@@ -217,7 +217,7 @@ class RegexPatterns:
                         _port, _service, version, ttl = _match
                         if not version and ttl:
                             srv = (proto, _port, _service, None, ttl)
-                            log_pattern(output, tag, "portscan", f"{proto}/{_port}/{_service} => {ttl}")
+                            log_pattern(output, tag, "portscan", f"{proto}/{_port}/{_service} => ({ttl})")
                         
                         if not ttl and version:
                             srv = (proto, _port, _service, version, None)
@@ -228,7 +228,7 @@ class RegexPatterns:
                             log_pattern(output, tag, "portscan", f"{proto}/{_port}/{_service}")
                         
                         srv = (proto, _port, _service, version, ttl)
-                        log_pattern(output, tag, "portscan", f"{proto}/{_port}/{_service} => {version}{ttl}")
+                        log_pattern(output, tag, "portscan", f"{proto}/{_port}/{_service} => {version} ({ttl})")
                 
                 if srv not in matches:
                     matches.append(srv)
@@ -291,16 +291,23 @@ class RegexPatterns:
 
 async def runcommand(cmd, tag, output, module):
     """Generic command runner with pattern matching"""
-    
+    tool = None
     info('Running {bgreen}{tool}{rst} against: {byellow}{target}{rst}',
         tool=tag[1], target=tag[2])
+    
+    
         
     # Config Patterns
     if not module:
         error("No module asigned to the execute the command. {tag}")
+    
+    if tag[0] is'scans' and module is 'netscan':
+        tool = tag[1].split(':')[0]
+    else:
+        tool = tag[1]
 
     p_patterns = PatternsLoader(module)
-    patterns = p_patterns.get_patterns_by_name(tag[0], tag[1])
+    patterns = p_patterns.get_patterns_by_name(tag[0], tool)
     regex_pattern = RegexPatterns(patterns)
 
 

@@ -87,6 +87,12 @@ PATTERNS = {
             "description": "info: {match}",
             "pattern": r'/tmp/GITrepo_[^\s]*.*$'
             }
+        ],
+        "GlobalPatterns": [
+            {
+                'description': 'cve: {match}',
+                'pattern': r'(CVE-\d{4}-\d{4,7})'
+            }
         ]
     },
     "ipnet":{
@@ -157,6 +163,12 @@ PATTERNS = {
             "description": "tcpports: {match}",
             "pattern": r'(.*Found open ports:.*)'
             }
-        ]
+        ],
+        "GlobalPatterns": [
+            {
+                'description': 'cve: {match}',
+                'pattern': r'(CVE-\d{4}-\d{4,7})'
+            }
+        ],
     }
 }
