@@ -13,7 +13,7 @@ class Nuclei:
     tag: List[str] = field(default_factory=lambda: ["scans", "Nuclei"])
     supported_modules: List[str] = field(default_factory=lambda: ["netscan"])
     services_matches: Tuple[str, ...] = field(default_factory=tuple)
-    run_once: bool = False
+    run_once: bool = True
         
     async def run(target, tag, output, module):
         tag[1] = f"{tag[1]}:tcp/0000/full"

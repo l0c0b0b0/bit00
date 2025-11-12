@@ -301,7 +301,7 @@ async def runcommand(cmd, tag, output, module):
     if not module:
         error("No module asigned to the execute the command. {tag}")
     
-    if tag[0] is'scans' and module is 'netscan':
+    if tag[0] == 'scans' and module == 'netscan':
         tool = tag[1].split(':')[0]
     else:
         tool = tag[1]

@@ -113,6 +113,9 @@ class netscan:
         debug("Starting NetScan Enumeration on target: {byellow}{target}{rst}", target=self.target)
         
         for plug, props in self.plugins.items():
+            if not self.check_run_once(plug=plug, props=props):
+                continue
+            
             props["tag"].append(self.target)
             plugin = p_loader.load_plugin(props["path"])
             module = props['supported_modules'][0]

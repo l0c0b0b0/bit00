@@ -12,7 +12,7 @@ class NmapTCPFull:
     tag: List[str] = field(default_factory=lambda: ["portscan", "NmapTCPFull"])
     supported_modules: List[str] = field(default_factory=lambda: ["netscan"])
     services_matches: Tuple[str, ...] = field(default_factory=tuple)
-    run_once: bool = False
+    run_once: bool = True
 
     async def run(target, tag, output, module):
 
