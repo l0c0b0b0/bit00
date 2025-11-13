@@ -1,9 +1,9 @@
 PATTERNS = {
     "portscan": {
-        "MasscanFull": [
+        "NaabuTCPFull": [
             {
             "description": "portscan: {match}",
-            "pattern": r'^Discovered\s+open\s+port\s*(?P<port>\d+)/(?:tcp)\b'
+            "pattern": r'^(?P<port>\d+)/(?:)(?P<protocol>tcp|udp)\s+\S+\s+(?P<service>[A-Za-z0-9_.+-]+)\s*(?P<version>.*)$'
             }
         ],
         "NmapTCPFull": [
@@ -12,10 +12,10 @@ PATTERNS = {
             "pattern": r'^(?P<port>\d+)/(?:)(?P<protocol>tcp|udp)\s+\S+\s+(?P<service>[A-Za-z0-9_.+-]+)\s*(?P<version>.*)$'
             }
         ],
-        "MasscanTop1000": [
+        "NaabuTCPTop1000": [
             {
             "description": "portscan: {match}",
-            "pattern": r'^Discovered\s+open\s+port\s*(?P<port>\d+)/(?:tcp)\b'
+            "pattern": r'^(?P<port>\d+)/(?:)(?P<protocol>tcp|udp)\s+\S+\s+(?P<service>[A-Za-z0-9_.+-]+)\s*(?P<version>.*)$'
             }
         ],
         "NmapTCPTop1000": [
@@ -26,32 +26,6 @@ PATTERNS = {
         ]
     },
     "scans": {
-        "Nuclei": [
-            {
-                'description': 'tech: {match}',
-                'pattern': r'^\[.*-detect.*'
-            },
-            {
-                'description': 'tech: {match}',
-                'pattern': r'^\[azure-domain-tenant\].*'
-            },
-            {
-                'description': 'vuln: {match}',
-                'pattern': r'.*\[vuln\].*'
-            },
-            {
-                'description': 'vuln: {match}',
-                'pattern': r'.*\[medium\].*'
-            },
-            {
-                'description': 'vuln: {match}',
-                'pattern': r'.*\[high\].*'
-            },
-            {
-                'description': 'cve: {match}',
-                'pattern': r'^\[CVE-.*'
-            }
-        ],
         "Cmseek": [
             {
                 'description': 'tech: {match}',
@@ -112,6 +86,33 @@ PATTERNS = {
             {
                 'description': 'vuln: {match}',
                 'pattern': r'Anonymous FTP login allowed'
+            },{
+                'description': 'tech: {match}',
+                'pattern': r'^\[.*-detect.*'
+            },
+            {
+                'description': 'tech: {match}',
+                'pattern': r'^\[azure-domain-tenant\].*'
+            },
+            {
+                'description': 'vuln: {match}',
+                'pattern': r'.*\[vuln\].*'
+            },
+            {
+                'description': 'vuln: {match}',
+                'pattern': r'.*\[medium\].*'
+            },
+            {
+                'description': 'vuln: {match}',
+                'pattern': r'.*\[high\].*'
+            },
+            {
+                'description': 'vuln: {match}',
+                'pattern': r'.*\[critical\].*'
+            },
+            {
+                'description': 'cve: {match}',
+                'pattern': r'^\[CVE-.*'
             }
         ]
     }

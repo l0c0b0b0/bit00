@@ -136,6 +136,9 @@ class RegexPatterns:
                 if 'arpa' in _xydomain:
                     continue
 
+                if re.match(r'^\d+\.\d+\.\d+\.\d+\.', _xydomain):
+                    continue
+
                 if basedomain and not _xydomain.endswith(basedomain):
                     continue
 

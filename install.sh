@@ -40,10 +40,8 @@ check_tool python3-colorama || true
 check_tool python3-tldextract || true
 check_tool golang || true
 check_tool curl || true
-check_tool spiderfoot || true
 check_tool dnsrecon || true
 check_tool fierce || true
-check_tool cloud-enum || true
 check_tool asn || true 
 check_tool theharvester || true
 check_tool seclists || true
@@ -65,6 +63,7 @@ check_tool cmseek || true
 check_tool nuclei || true
 check_tool netexec || true
 check_tool ffuf || true
+check_tool naabu || true
 
 # Ask for installation confirmation
 echo ""
@@ -87,10 +86,10 @@ case "$confirm_install" in
         /usr/bin/sudo apt install -y git jq python3-colorama python3-tldextract golang curl
         
         echo "[+] Installing OSINT Tools:"
-        /usr/bin/sudo apt install -y spiderfoot dnsrecon fierce cloud-enum asn theharvester
+        /usr/bin/sudo apt install -y dnsrecon fierce asn theharvester subfinder
         
         echo "[+] Installing NETSCAN Tools:"
-        /usr/bin/sudo apt install -y seclists dnsrecon enum4linux feroxbuster gobuster impacket-scripts nbtscan nmap redis-tools smbclient smbmap snmp sslscan sipvicious whatweb cmseek nuclei netexec ffuf
+        /usr/bin/sudo apt install -y seclists dnsrecon naabu enum4linux feroxbuster gobuster impacket-scripts nbtscan nmap redis-tools smbclient smbmap snmp sslscan sipvicious whatweb cmseek nuclei netexec ffuf
         ;;
 esac
 
