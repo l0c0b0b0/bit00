@@ -229,5 +229,5 @@ class netscan:
                         target=target, time=calculate_elapsed_time(start_time))
             
         except Exception as e:
-            error("NetScan error for {target}: {error}", target=target, error=str(e))
+            error("NetScan error for {target}: {_e}", target=target, _e=str(e))
             return error("NetScan Error: {target}")

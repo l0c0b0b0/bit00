@@ -4,11 +4,11 @@ from typing import List, Tuple
 from core.runcmd import runcommand
 
 @dataclass
-class DNSReconRegisters:
+class DNSRegistersRecon:
     """DNS enumeration using dnsrecon."""
-    name: str = "DNSReconRegisters"
+    name: str = "DNSRegistersRecon"
     description: str = "DNS reconnaissance."
-    tag: List[str] = field(default_factory=lambda: ["scans", "DNSReconRegisters"])
+    tag: List[str] = field(default_factory=lambda: ["scans", "DNSRegistersRecon"])
     supported_modules: List[str] = field(default_factory=lambda: ["netscan"])
     services_matches: Tuple[str, ...] = field(default=('^domain',))
     run_once: bool = True

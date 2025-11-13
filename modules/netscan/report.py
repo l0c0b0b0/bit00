@@ -197,7 +197,6 @@ class NetScanParser:
         ttl = self._extract_ttl(service_details)
         os_type = "Linux" if ttl and ttl < 64 else "Windows" if ttl else "Unknown"
         
-        print(ttl)
         # Store the data
         self.netscan_data[ip_address]['os'] = os_type
         self.netscan_data[ip_address]['ttl'] = ttl

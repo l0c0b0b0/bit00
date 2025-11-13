@@ -177,10 +177,10 @@ class OSINTParser:
     def _process_domain2ip(self, plugin, target, content):
         """Process domain to IP mapping entries"""
         # content: "190.14.106.3-www.agetic.gob.bo"
-        match = re.search(r'([\d.]+)\s*=>\s*([\w.-]+)', content)
+        match = re.search(r'(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})\s*=>\s*([a-zA-Z0-9.-]+\.[a-zA-Z]{2,})', content)
         if match:
             ip, hostname = match.groups()
-            
+                                  
             # Store IP to hostname mapping
             self.ip_to_hostname[ip] = hostname
             
@@ -189,15 +189,16 @@ class OSINTParser:
             if base_domain:
                 self.basedomains.add(base_domain)
             
-            # Add to osint_data
+                # Add to osint_data
             target_key = f"{hostname}:{ip}"
             entry = {
-                'plugin': plugin,
-                'content': content[:80]  # Limit content length
-            }
+                    'plugin': plugin,
+                    'content': content[:80]  # Limit content length
+                }
             # Check for duplicates before adding
             if not self._is_duplicate_in_list(self.osint_data[target_key]['host'], entry):
                 self.osint_data[target_key]['host'].append(entry)
+            
 
     def _process_dnsenum(self, plugin, target, content):
         """Process DNS enumeration entries"""
@@ -329,7 +330,7 @@ class OSINTParser:
 
     def _is_valid_ip(self, ip):
         """Check if the string is a valid IP address"""
-        ip_pattern = r'^\b(?:[0-9]{1,3}\.){3}[0-9]{1,3}\b$'
+        ip_pattern = r'^\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}$'
         return re.match(ip_pattern, ip) is not None  
     
 def generate_osint_text(osint_data, basedomains, output_dir):

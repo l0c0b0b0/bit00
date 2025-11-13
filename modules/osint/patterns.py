@@ -125,6 +125,10 @@ PATTERNS = {
             },
             {
             "description": "dnsenum: {match}",
+            "pattern": r'([ \t ]CNAME\s.*)'
+            },
+            {
+            "description": "dnsenum: {match}",
             "pattern": r'([ \t ]MX\s.*\s\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})'
             },
             {

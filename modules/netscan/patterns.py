@@ -58,7 +58,7 @@ PATTERNS = {
                 'pattern': r'Version Detected.*'
             }
         ],
-        "DNSReconRegisters": [
+        "DNSRegistersRecon": [
             {
             "description": "dnsenum: {match}",
             "pattern": r'([ \t ]NS\s.*\s\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})'

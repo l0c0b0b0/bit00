@@ -305,7 +305,7 @@ async def runcommand(cmd, tag, output, module):
         tool = tag[1].split(':')[0]
     else:
         tool = tag[1]
-
+    
     p_patterns = PatternsLoader(module)
     patterns = p_patterns.get_patterns_by_name(tag[0], tool)
     regex_pattern = RegexPatterns(patterns)
