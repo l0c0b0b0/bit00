@@ -195,7 +195,10 @@ class NetScanParser:
     
         # Initialize IP entry if it doesn't exist
         if ip_address not in self.netscan_data:
-            self.netscan_data[ip_address] = {'os': 'Unknown', 'ttl': None, 'services': []}
+            if not ttl and not os_type:
+                self.netscan_data[ip_address] = {'os': 'Unknown', 'ttl': None, 'services': []}
+            
+            self.netscan_data[ip_address] = {'os': os_type, 'ttl': ttl, 'services': []}
     
         # Update OS and TTL information
         self.netscan_data[ip_address]['os'] = os_type
