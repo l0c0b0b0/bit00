@@ -78,18 +78,18 @@ echo "This will install required packages and tools."
 #        exit 0
 #        ;;
 #    *)
-        echo "[+] Start installing"
-        echo "[+] Updating OS:"
-        /usr/bin/sudo apt update
+echo "[+] Start installing"
+echo "[+] Updating OS:"
+/usr/bin/sudo apt update
         
-        echo "[+] Installing Main packages:"
-        /usr/bin/sudo apt install -y git jq python3-colorama python3-tldextract golang curl
+echo "[+] Installing Main packages:"
+/usr/bin/sudo apt install -y git jq python3-colorama python3-tldextract golang curl
         
-        echo "[+] Installing OSINT Tools:"
-        /usr/bin/sudo apt install -y dnsrecon fierce asn theharvester subfinder
+echo "[+] Installing OSINT Tools:"
+/usr/bin/sudo apt install -y dnsrecon fierce asn theharvester subfinder
         
-        echo "[+] Installing NETSCAN Tools:"
-        /usr/bin/sudo apt install -y seclists dnsrecon naabu enum4linux feroxbuster gobuster impacket-scripts nbtscan nmap redis-tools smbclient smbmap snmp sslscan sipvicious whatweb cmseek nuclei netexec ffuf
+echo "[+] Installing NETSCAN Tools:"
+/usr/bin/sudo apt install -y seclists dnsrecon naabu enum4linux feroxbuster gobuster impacket-scripts nbtscan nmap redis-tools smbclient smbmap snmp sslscan sipvicious whatweb cmseek nuclei netexec ffuf
 #        ;;
 #esac
 
