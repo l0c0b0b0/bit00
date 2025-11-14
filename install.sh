@@ -63,6 +63,7 @@ check_tool cmseek || true
 check_tool nuclei || true
 check_tool netexec || true
 check_tool ffuf || true
+check_tool sublist3r || true
 check_tool naabu || true
 
 # 3. Installation
@@ -78,7 +79,7 @@ echo "[+] Installing Main packages:"
 /usr/bin/sudo apt install -y git jq python3-colorama python3-tldextract golang curl
         
 echo "[+] Installing OSINT Tools:"
-/usr/bin/sudo apt install -y dnsrecon fierce asn theharvester subfinder
+/usr/bin/sudo apt install -y dnsrecon fierce asn theharvester subfinder sublist3r
         
 echo "[+] Installing NETSCAN Tools:"
 /usr/bin/sudo apt install -y seclists dnsrecon naabu enum4linux feroxbuster gobuster impacket-scripts nbtscan nmap redis-tools smbclient smbmap snmp sslscan sipvicious whatweb cmseek nuclei netexec ffuf
