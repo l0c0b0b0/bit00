@@ -126,8 +126,8 @@ class osint:
                                 )
                             )
                     except Exception as e:
-                        error("Plugin {plugin} failed on {target_type}: {error}", 
-                        plugin=plug, target_type=target_type, error=str(e))             
+                        error("Plugin {plugin} failed on {target_type}: {_e}", 
+                        plugin=plug, target_type=target_type, _e=str(e))             
     
     async def recon_osint(self):        
         """Main OSINT reconnaissance"""
@@ -152,8 +152,8 @@ class osint:
                 )
 
             except Exception as e:
-                error("Plugin {plugin} failed: {error}", 
-                    plugin=plug, error=str(e))  
+                error("Plugin {plugin} failed: {_e}", 
+                    plugin=plug, _e=str(e))  
 
     async def update_results(self, ips=None, subdomain=None):
         #print(results)
@@ -208,14 +208,14 @@ class osint:
                                         await self.scan_osint(ipaddress=ipaddress, subdomain=subdomain, flag=flag)
 
                                     except (TypeError, ValueError) as e:
-                                        error('Error unpacking update_results: {error}. Result: {result}', 
-                                                error=str(e), result=update_result)
+                                        error('Error unpacking update_results: {_e}. Result: {result}', 
+                                                _e=str(e), result=update_result)
                                         continue
                             
                 except AttributeError as e:
-                    error('Attribute error in task result: {error}', error=str(e))
+                    error('Attribute error in task result: {_e}', _e=str(e))
                 except Exception as e:
-                    error('Error processing task result: {error}', error=str(e))
+                    error('Error processing task result: {_e}', _e=str(e))
         
         return {"status": "completed", "results": True}
     
@@ -258,7 +258,7 @@ class osint:
                         target=target, time=calculate_elapsed_time(start_time))
             
         except Exception as e:
-            error("OSINT error for {target}: {error}", target=target, error=str(e))
+            error("OSINT error for {target}: {_e}", target=target, _e=str(e))
             return error("OSINT Error: {target}")
 
             

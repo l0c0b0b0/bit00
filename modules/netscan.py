@@ -106,8 +106,8 @@ class netscan:
                     )
                 )
             except Exception as e:
-                error("Plugin {plugin} failed on {target}: {error}", 
-                        plugin=plug, target=self.target, error=str(e))
+                error("Plugin {plugin} failed on {target}: {_e}", 
+                        plugin=plug, target=self.target, _e=str(e))
     
     async def portscan(self):
 
@@ -132,8 +132,8 @@ class netscan:
                     )
                 )
             except Exception as e:
-                error("Plugin {plugin} failed: {error}", 
-                    plugin=plug, error=str(e))
+                error("Plugin {plugin} failed: {_e}", 
+                    plugin=plug, _e=str(e))
 
     async def update_results(self, service):
         if service not in self.results:
@@ -184,15 +184,15 @@ class netscan:
                                 await self.services_scan(protocol=protocol, port=port, service=service)
 
                             except (TypeError, ValueError) as e:
-                                error('Error unpacking update_results: {error}. Result: {result}', 
-                                        error=str(e), result=result)
+                                error('Error unpacking update_results: {_e}. Result: {result}', 
+                                        _e=str(e), result=result)
                                 continue
 
                             #await self.scan_services(semaphore, service=service, protocol=protocol, port=port)                        
                 except AttributeError as e:
-                    self.error('Attribute error in task result: {error}', error=str(e))
+                    self.error('Attribute error in task result: {_e}', _e=str(e))
                 except Exception as e:
-                    self.error('Error processing task result: {error}', error=str(e))
+                    self.error('Error processing task result: {_e}', _e=str(e))
 
         
     
