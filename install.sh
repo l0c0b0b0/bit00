@@ -93,6 +93,16 @@ case "$confirm_install" in
         ;;
 esac
 
+# 3.1 Update nuclei an another tools
+echo ""
+echo "3.1 Update nuclei templates:"
+/usr/bin/sudo apt install --only-upgrade nuclei
+/usr/bin/sudo /usr/bin/nuclei -update-templates
+
+echo "3.2 Upgrade tools:"
+echo ""
+/usr/bin/sudo apt install --only-upgrade seclists impacket-scripts nmap cmseek netexec
+
 # 4. Config Golang
 echo ""
 echo "4. Config Golang:"
