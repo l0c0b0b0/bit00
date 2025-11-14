@@ -133,7 +133,7 @@ class NetScanParser:
                     timestamp = match.group(1)  # "20251109:21.53.15"
                     phase = match.group(2)      # "portscan" or "scans"
                     plugin = match.group(3)     # "NmapTCPTop1000" or "NmapHttp"
-                                    
+
                     # Handle different phases with different field mappings
                     if phase == 'portscan':
                         # Format: [timestamp]:portscan:plugin:ip:service_details:context
@@ -205,9 +205,9 @@ class NetScanParser:
         service_desc = f"{service_details}"
     
         # Add the service entry
-        self.netscan_data[ip_address]['services'].append((plugin, service_desc))
+        self.netscan_data[ip_address]['services'].append((plugin, context))
     
-        debug(f"\tAdded service for {ip_address}: {plugin} - {service_desc} (TTL: {ttl}, OS: {os_type})")
+        debug(f"\tAdded service for {ip_address}: {plugin} - {context} (TTL: {ttl}, OS: {os_type})")
 
     def _is_valid_ip(self, ip):
         """Check if the string is a valid IP address"""
