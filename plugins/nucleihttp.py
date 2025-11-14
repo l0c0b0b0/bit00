@@ -19,6 +19,6 @@ class NucleiHttp:
         sleep_time = random.randint(7, 15)
         await asyncio.sleep(sleep_time)
         """Run nuclei scan."""
-        cmd = f'/usr/bin/nuclei -no-color -silent -no-interactsh -target {service}://{target}:{port} -t http -rate-limit 50 -concurrency 5 -retries 2 -max-host-error 2 -o {output}/scans/{protocol}_{port}_{service}_nuclei.txt'
+        cmd = f'/usr/bin/nuclei -no-color -silent -no-interactsh -target {service}://{target}:{port} -t http -rate-limit 50 -concurrency 10 -retries 2 -max-host-error 2 -o {output}/scans/{protocol}_{port}_{service}_nuclei.txt'
         
         return await runcommand(cmd=cmd, tag=tag, output=output, module=module)
