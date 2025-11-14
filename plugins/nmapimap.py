@@ -10,7 +10,7 @@ class NmapImap:
     description: str = "imap scanning with nmap-imap"
     tag: List[str] = field(default_factory=lambda: ["scans", "NmapImap"])
     supported_modules: List[str] = field(default_factory=lambda: ["netscan"])
-    services_matches: Tuple[str, ...] = field(default=('^imap', '^imaps','^irc'))
+    services_matches: Tuple[str, ...] = field(default=(r'^imap.?', '^irc'))
     run_once: bool = False
         
     

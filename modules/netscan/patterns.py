@@ -3,25 +3,25 @@ PATTERNS = {
         "NaabuTCPFull": [
             {
             "description": "portscan: {match}",
-            "pattern": r'^(?P<port>\d+)/(?:)(?P<protocol>tcp|udp)\s+\S+\s+(?P<service>[A-Za-z0-9_.+-]+)\s*(?P<version>.*)$'
+            "pattern": r'^(?P<port>\d+)/(?:)(?P<protocol>tcp|udp)\s+\S+\s+(?P<service>\S+)\s*(?P<version>.*)$'
             }
         ],
         "NmapTCPFull": [
             {
             "description": "portscan: {match}",
-            "pattern": r'^(?P<port>\d+)/(?:)(?P<protocol>tcp|udp)\s+\S+\s+(?P<service>[A-Za-z0-9_.+-]+)\s*(?P<version>.*)$'
+            "pattern": r'^(?P<port>\d+)/(?:)(?P<protocol>tcp|udp)\s+\S+\s+(?P<service>\S+)\s*(?P<version>.*)$'
             }
         ],
         "NaabuTCPTop1000": [
             {
             "description": "portscan: {match}",
-            "pattern": r'^(?P<port>\d+)/(?:)(?P<protocol>tcp|udp)\s+\S+\s+(?P<service>[A-Za-z0-9_.+-]+)\s*(?P<version>.*)$'
+            "pattern": r'^(?P<port>\d+)/(?:)(?P<protocol>tcp|udp)\s+\S+\s+(?P<service>\S+)\s*(?P<version>.*)$'
             }
         ],
         "NmapTCPTop1000": [
             {
             "description": "portscan: {match}",
-            "pattern": r'^(?P<port>\d+)/(?:)(?P<protocol>tcp|udp)\s+\S+\s+(?P<service>[A-Za-z0-9_.+-]+)\s*(?P<version>.*)$'
+            "pattern": r'^(?P<port>\d+)/(?:)(?P<protocol>tcp|udp)\s+\S+\s+(?P<service>\S+)\s*(?P<version>.*)$'
             }
         ]
     },

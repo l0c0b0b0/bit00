@@ -10,7 +10,7 @@ class NmapSmb:
     description: str = "smb scanning with nmap-smb"
     tag: List[str] = field(default_factory=lambda: ["scans", "NmapSmb"])
     supported_modules: List[str] = field(default_factory=lambda: ["netscan"])
-    services_matches: Tuple[str, ...] = field(default=('^smb', '^microsoft-ds', '^netbios'))
+    services_matches: Tuple[str, ...] = field(default=('^smb', '^microsoft-ds', '^netbios-ssn', '^netbios'))
     run_once: bool = False
         
         

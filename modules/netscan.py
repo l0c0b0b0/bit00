@@ -71,17 +71,18 @@ class netscan:
         debug("Starting NetScan scanning {bmagenta}{service}:{port}{rst} on: {byellow}{target}{rst} ", 
                 target=self.target, service=service)
         
-        secure = any(x in service.lower() for x in ['ssl', 'tls', 'https', 'ldapssl'])
+        secure = any(x in service.lower() for x in ['ssl', 'tls', 'https'])
         
         if secure == True:
-            if service.startswith('ssl/') or service.startswith('tls/') or service.startswith('ssl'):
+            if service.startswith('ssl/') or service.startswith('tls/'):
                 if service[4:] == 'http' or port == '443':
                     service = 'https'
-                    scan_plugins = self.setup_scan_sslplugins(service)
-            
-            scan_plugins = self.setup_scan_sslplugins(service)
-        else:
-            scan_plugins = self.setup_scan_plugins(service)
+                    #scan_plugins = self.setup_scan_sslplugins(service)
+                
+                service = service[4:]
+                scan_plugins = self.setup_scan_sslplugins(service)
+        
+        scan_plugins = self.setup_scan_plugins(service)
         
         for plug, props in scan_plugins.items():
             if not self.check_run_once(plug=plug, props=props):

@@ -10,7 +10,7 @@ class NucleiSmb:
     description: str = "smb scanning with nuclei-smb"
     tag: List[str] = field(default_factory=lambda: ["scans", "NucleiSmb"])
     supported_modules: List[str] = field(default_factory=lambda: ["netscan"])
-    services_matches: Tuple[str, ...] = field(default=('^smb', '^microsoft-ds', '^netbios'))
+    services_matches: Tuple[str, ...] = field(default=('^smb', '^microsoft-ds', '^netbios-ssn', '^netbios'))
     run_once: bool = False
         
         
