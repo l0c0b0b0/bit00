@@ -65,19 +65,11 @@ check_tool netexec || true
 check_tool ffuf || true
 check_tool naabu || true
 
-# Ask for installation confirmation
+# 3. Installation
 echo ""
 echo "3. Install Packages and Tools:"
 echo "This will install required packages and tools."
-#printf "Do you want to proceed? (Y/n): "
-#read confirm_install
 
-#case "$confirm_install" in
-#    [nN]|[nN][oO])
-#        echo "Installation cancelled."
-#        exit 0
-#        ;;
-#    *)
 echo "[+] Start installing"
 echo "[+] Updating OS:"
 /usr/bin/sudo apt update
@@ -90,98 +82,35 @@ echo "[+] Installing OSINT Tools:"
         
 echo "[+] Installing NETSCAN Tools:"
 /usr/bin/sudo apt install -y seclists dnsrecon naabu enum4linux feroxbuster gobuster impacket-scripts nbtscan nmap redis-tools smbclient smbmap snmp sslscan sipvicious whatweb cmseek nuclei netexec ffuf
-#        ;;
-#esac
 
-# 3.1 Update nuclei an another tools
+
+# Update nuclei an another tools
 echo ""
-echo "3.1 Update nuclei templates:"
+echo "Update nuclei templates:"
 /usr/bin/sudo apt install --only-upgrade nuclei
 /usr/bin/sudo /usr/bin/nuclei -update-templates
 
-echo "3.2 Upgrade tools:"
+echo "Upgrade tools:"
 echo ""
 /usr/bin/sudo apt install --only-upgrade seclists impacket-scripts nmap cmseek netexec
 
-# 4. Config Golang
+# 4. Install Vulnx
+
 echo ""
-echo "4. Config Golang:"
-#echo "Default: GOROOT=/usr/bin/go"
-echo "Default: GOPATH=/opt/go"
-#printf "Use default Go paths? (Y/n): "
-#read go_confirm
+echo "4. Install Vulnx:"
 
-#case "$go_confirm" in
-#    [nN]|[nN][oO])
-        #printf "Set Go executable path: "
-        #read go_root
-#printf "Set Go directory path: "
-#read go_path
-#        ;;
-#    *)
-        #go_root="/usr/bin/go"
-go_path="/opt/go"
-#        ;;
-#esac
-
-# Create Go directories
-/usr/bin/sudo mkdir -p "$go_path"/bin "$go_path"/src "$go_path"/pkg
-/usr/bin/sudo chown -R "$(id -u):$(id -g)" "$go_path"
-
-# Detect shell and update profile
-if [ -n "$ZSH_VERSION" ]; then
-    shell_profile="$HOME/.zshrc"
-else
-    shell_profile="$HOME/.bashrc"
-fi
-
-# Add Go to shell profile
-{
-    #echo "export GOROOT=$go_root"
-    echo "export GOPATH=$go_path"
-    echo "export PATH=\$PATH:\$GOPATH/bin"
-} >> "$shell_profile"
-
-# Source the profile
-. "$shell_profile"
-
-#export GOROOT="$go_root"
-export GOPATH="$go_path"
-export PATH="\$PATH:\$GOPATH/bin"
-
-# 5. Install Vulnx
-echo ""
-echo "5. Install Vulnx:"
-#printf "Install Vulnx? (Y/n): "
-#read vulnx_confirm
-
-#case "$vulnx_confirm" in
-#    [nN]|[nN][oO])
-#        echo "Skipping Vulnx installation."
-#        ;;
-#    *)
 echo "[+] Installing Vulnx in dest: $GOPATH/bin/vulnx"
 /usr/bin/go install github.com/projectdiscovery/cvemap/cmd/vulnx@latest
         
 echo "[+] Changing name because there is a tool on github python called vulnx"
 /usr/bin/sudo ln -sf "$GOPATH/bin/vulnx" /usr/local/bin/vulnx00
 echo "Accessible from vulnx00 [Ok]"
-#        ;;
-#esac
 
-# 6. Verify installation
-echo ""
-echo "6. Verification checklist:"
-echo "Checking if main packages are installed:"
-if command -v vulnx00 >/dev/null 2>&1; then
-    echo "[+] vulnx00	 [Ok]"
-else
-    echo "[+] vulnx00	 [Not Found]"
-fi
+# 5. Install Bit00 framework
 
-# 7. Install Bit00 framework
 echo ""
-echo "7. Installing Bit00 framework:"
+echo "5. Installing Bit00 framework:"
+
 bit00_dir="/opt/bit00"
 
 echo "[+] Downloading from https://github.com/l0c0b0b0/Bit00.git"
@@ -193,10 +122,10 @@ echo "[+] Setting permissions to 755"
 echo "[+] Creating symlink"
 /usr/bin/sudo ln -sf "$bit00_dir/bit00.py" /usr/local/bin/bit00
 
-# 8. Installation complete
+# 6. Installation complete
 
 echo ""
-echo "8. Installation finish successfully!!!"
+echo "6. Installation finish successfully!!!"
 echo "Bit00 framework installed in: $bit00_dir"
 echo "Accessible via: bit00"
 echo ""
