@@ -18,8 +18,7 @@ class NmapTCPTop1000:
 
         """Run nmap scan."""
         cmd = f"nmap -vv -Pn --top-ports=1000 --min-rate=1000 -T4 --open -O --osscan-guess --osscan-limit --max-os-tries 5 -sV --traceroute --disable-arp-ping --source-port 53 \
--oG {output}/scans/gnmap/_top_1000_tcp_nmap.gnmap -oN {output}/scans/_top_1000_tcp_nmap.txt -oX {output}/scans/xml/_top_1000_tcp_nmap.xml {target}; \
-searchsploit --nmap {output}/scans/xml/_top_1000_tcp_nmap.xml > {output}/scans/searchsploit-nmap-tcp.ansi"
+-oG {output}/scans/gnmap/_top_1000_tcp_nmap.gnmap -oN {output}/scans/_top_1000_tcp_nmap.txt -oX {output}/scans/xml/_top_1000_tcp_nmap.xml {target};"
         
         return await runcommand(cmd=cmd, tag=tag, output=output, module=module)
     

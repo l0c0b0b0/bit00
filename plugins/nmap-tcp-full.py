@@ -18,8 +18,7 @@ class NmapTCPFull:
 
         """Run nmap scan."""
         cmd = f"nmap -vv -Pn -p- --min-rate=1000 -T4 --open -O --osscan-guess --osscan-limit --max-os-tries 3 -sV --version-all --traceroute --disable-arp-ping --source-port 53 {target} \
--oG {output}/scans/gnmap/_full_tcp_nmap.gnmap -oN {output}/scans/_full_tcp_nmap.txt -oX {output}/scans/xml/_full_tcp_nmap.xml; \
-searchsploit --nmap {output}/scans/xml/_full_tcp_nmap.xml > {output}/scans/searchsploit-nmap-tcp.ansi"
+-oG {output}/scans/gnmap/_full_tcp_nmap.gnmap -oN {output}/scans/_full_tcp_nmap.txt -oX {output}/scans/xml/_full_tcp_nmap.xml; "
         
         return await runcommand(cmd=cmd, tag=tag, output=output, module=module)
     
