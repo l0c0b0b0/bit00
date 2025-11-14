@@ -10,7 +10,7 @@ class NucleiImap:
     description: str = "imap scanning with nuclei-imap"
     tag: List[str] = field(default_factory=lambda: ["scans", "NucleiImap"])
     supported_modules: List[str] = field(default_factory=lambda: ["netscan"])
-    services_matches: Tuple[str, ...] = field(default=(r'^imap.?' , '^imap-proxy', '^irc'))
+    services_matches: Tuple[str, ...] = field(default=('^imap-proxy', '^imapd' , '^imaps' , '^imap', '^irc'))
     run_once: bool = False
         
     

@@ -10,7 +10,7 @@ class NmapHttp:
     description: str = "http scanning with nmap-http"
     tag: List[str] = field(default_factory=lambda: ["scans", "NmapHttp"])
     supported_modules: List[str] = field(default_factory=lambda: ["netscan"])
-    services_matches: Tuple[str, ...] = field(default=('^http', '^http-proxy', '^https'))
+    services_matches: Tuple[str, ...] = field(default=('^http', '^https', '^http-proxy'))
     run_once: bool = False
             
     async def run(target, tag, output, service, protocol, port, module):

@@ -73,17 +73,17 @@ class netscan:
         
         secure = any(x in service.lower() for x in ['ssl', 'tls', 'https'])
         
-        if secure == True:
-            if service.startswith('ssl/') or service.startswith('tls/'):
-                if service[4:] == 'http' or port == '443':
-                    service = 'https'
-                    #scan_plugins = self.setup_scan_sslplugins(service)
-                
+        if secure != True:
+            scan_plugins = self.setup_scan_plugins(service)    
+        
+        if service.startswith('ssl/') or service.startswith('tls/'):
+            if service[4:] == 'http':
+                service = 'https'
+            else:    
                 service = service[4:]
-                scan_plugins = self.setup_scan_sslplugins(service)
-        
-        scan_plugins = self.setup_scan_plugins(service)
-        
+            
+            scan_plugins = self.setup_scan_sslplugins(service)
+            
         for plug, props in scan_plugins.items():
             if not self.check_run_once(plug=plug, props=props):
                 continue
@@ -106,7 +106,7 @@ class netscan:
                     )
                 )
             except Exception as e:
-                error("Plugin {plugin} failed on {target}: {_e}", 
+                error("Plugin Scans{plugin} failed on {target}: {_e}", 
                         plugin=plug, target=self.target, _e=str(e))
     
     async def portscan(self):
@@ -132,7 +132,7 @@ class netscan:
                     )
                 )
             except Exception as e:
-                error("Plugin {plugin} failed: {_e}", 
+                error("Plugin PortScan {plugin} failed: {_e}", 
                     plugin=plug, _e=str(e))
 
     async def update_results(self, service):

@@ -208,7 +208,7 @@ class NetScanParser:
         service_desc = f"{service_details}"
     
         # Add the service entry
-        self.netscan_data[ip_address]['services'].append((plugin, context))
+        self.netscan_data[ip_address]['services'].append((plugin, f"{service_details}{context}"))
     
         debug(f"\tAdded service for {ip_address}: {plugin} - {context} (TTL: {ttl}, OS: {os_type})")
 

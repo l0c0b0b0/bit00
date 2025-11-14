@@ -193,31 +193,41 @@ class RegexPatterns:
                 
                 try:
                     proto = parse_match.group('protocol') if 'protocol' in parse_match.re.groupindex else None
+                    port = parse_match.group('port') if 'port' in parse_match.re.groupindex else None
+                    service = parse_match.group('service') if 'service' in parse_match.re.groupindex else None
+                    version = parse_match.group('version') if 'version' in parse_match.re.groupindex else None
                 except Exception:
-                    proto = None
+                    debug(f"Not pattern matches.!!!")
+                    continue
 
                 if not proto:
                     proto = 'tcp'
 
+                #print(proto, port,service,version)
                 _match = await self.parse_service_line(line)
                 
                 async with LOCK:
                     if _match:
-                        port, service, version, ttl = _match
-                        if not version and ttl:
-                            srv = (proto, port, service, None, ttl)
-                            log_pattern(output, tag, f"{proto}/{port}/{service} => ({ttl})")
+                        port, _service, _version, _ttl = _match
+                        #print(f"[===] {proto}/{port}/{_service} => ({_ttl}) {_version}")
+
+                        if not _version and _ttl:
+                            #print(f"[===] Only ttl {proto}/{port}/{_service} => ({_ttl})")
+                            srv = (proto, port, _service, None, _ttl)
+                            log_pattern(output, tag, f"{proto}/{port}/{_service}", f" => ({_ttl})")
                         
-                        if not ttl and version:
-                            srv = (proto, port, service, version, None)
-                            log_pattern(output, tag, f"{proto}/{port}/{service} => {version}")
+                        if not _ttl and _version:
+                            #print(f"[===] Only version {proto}/{port}/{_service} => {_version}")
+                            srv = (proto, port, _service, _version, None)
+                            log_pattern(output, tag, f"{proto}/{port}/{_service}", f" => {_version}")
                         
-                        if not ttl and not version:
-                            srv = (proto, port, service, None, None)
-                            log_pattern(output, tag, f"{proto}/{port}/{service}")
+                        if not _ttl and not _version:
+                            #print(f"[===] Nothing {proto}/{port}/{_service}")
+                            srv = (proto, port, _service, None, None)
+                            log_pattern(output, tag, f"{proto}/{port}/{_service}", f"")
                         
-                        srv = (proto, port, service, version, ttl)
-                        log_pattern(output, tag, f"{proto}/{port}/{service} => ({ttl}) {version}")
+                        srv = (proto, port, _service, _version, _ttl)
+                        log_pattern(output, tag, f"{proto}/{port}/{_service}", f" => ({_ttl}) {_version}")
                 
                 if srv not in matches:
                     matches.append(srv)

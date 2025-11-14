@@ -10,7 +10,7 @@ class NmapPop3:
     description: str = "pop3 scanning with nmap-pop3"
     tag: List[str] = field(default_factory=lambda: ["scans", "NmapPop3"])
     supported_modules: List[str] = field(default_factory=lambda: ["netscan"])
-    services_matches: Tuple[str, ...] = field(default=(r'^pop3.?',))
+    services_matches: Tuple[str, ...] = field(default=('^pop3', '^pop3s'))
     run_once: bool = False
         
     

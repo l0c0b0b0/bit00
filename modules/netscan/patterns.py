@@ -28,90 +28,90 @@ PATTERNS = {
     "scans": {
         "Cmseek": [
             {
-                'description': 'tech: {match}',
+                'description': 'TECH: {match}',
                 'pattern': r'Version Detected.*'
             }
         ],
         "DNSRegistersRecon": [
             {
-            "description": "dnsenum: {match}",
+            "description": "TECH: {match}",
             "pattern": r'([ \t ]NS\s.*\s\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})'
             },
             {
-            "description": "dnsenum: {match}",
+            "description": "TECH: {match}",
             "pattern": r'([ \t ]CNAME\s.*)'
             },
             {
-            "description": "dnsenum: {match}",
+            "description": "TECH: {match}",
             "pattern": r'([ \t ]A\s.*\s\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})'
             },
             {
-            "description": "dnsenum: {match}",
+            "description": "TECH: {match}",
             "pattern": r'([ \t ]MX\s.*\s\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})'
             },
             {
-            "description": "dnsenum: {match}",
+            "description": "TECH: {match}",
             "pattern": r'([ \t ]SOA\s.*\s\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})'
             },
             {
-            "description": "dnsenum: {match}",
+            "description": "TECH: {match}",
             "pattern": r'([ \t ]TXT\s.*\sv=spf.*)'
             },
             {
-            "description": "dnsenum: {match}",
+            "description": "TECH: {match}",
             "pattern": r'([ \t ]TXT\s.*\sv=spf.*)'
             },
             {
-            "description": "dnsenum: {match}",
+            "description": "TECH: {match}",
             "pattern": r'([ \t ]TXT\s.*\sv=DMAR.*)'
             },
             {
-            "description": "dnsenum: {match}",
+            "description": "TECH: {match}",
             "pattern": r'([ \t ]PTR\s.*\s\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})'
             }
         ],
         "GlobalPatterns": [
             {
-                'description': 'vuln: {match}',
+                'description': 'VULN: {match}',
                 'pattern': r'State: (?:(?:LIKELY\_?)?VULNERABLE)'
             },
             {
-                'description': 'vuln: {match})', 
+                'description': 'VULN: {match})', 
                 'pattern': r'(?i)unauthorized'
             },
             {
-                'description': 'cve: {match}',
+                'description': 'CVE: {match}',
                 'pattern': r'(CVE-\d{4}-\d{4,7})'
             },
             {
-                'description': 'vuln: {match}',
+                'description': 'VULN: {match}',
                 'pattern': r'Anonymous FTP login allowed'
             },{
-                'description': 'tech: {match}',
+                'description': 'TECH: {match}',
                 'pattern': r'^\[.*-detect.*'
             },
             {
-                'description': 'tech: {match}',
+                'description': 'TECH: {match}',
                 'pattern': r'^\[azure-domain-tenant\].*'
             },
             {
-                'description': 'vuln: {match}',
+                'description': 'VULN: {match}',
                 'pattern': r'.*\[vuln\].*'
             },
             {
-                'description': 'vuln: {match}',
+                'description': 'VULN: {match}',
                 'pattern': r'.*\[medium\].*'
             },
             {
-                'description': 'vuln: {match}',
+                'description': 'VULN: {match}',
                 'pattern': r'.*\[high\].*'
             },
             {
-                'description': 'vuln: {match}',
+                'description': 'VULN: {match}',
                 'pattern': r'.*\[critical\].*'
             },
             {
-                'description': 'cve: {match}',
+                'description': 'CVE: {match}',
                 'pattern': r'^\[CVE-.*'
             }
         ]
