@@ -18,7 +18,7 @@ class NaabuTCPFull:
 
         """Run nmap scan."""
         cmd = f"/usr/bin/naabu -host {target} -silent -no-color -c 10 -rate 1000 --top-ports full -nmap-cli '-vv -Pn --min-rate=1000 -T4 --open -O --osscan-guess --max-os-tries 5 -sV --traceroute --disable-arp-ping --source-port 53 \
--oG {output}/scans/gnmap/_top_1000_tcp_naabunmap.gnmap -oN {output}/scans/_top_1000_tcp_naabunmap.txt -oX {output}/scans/xml/_top_1000_tcp_naabunmap.xml {target}; \
+-oG {output}/scans/gnmap/_top_1000_tcp_naabunmap.gnmap -oN {output}/scans/_top_1000_tcp_naabunmap.txt -oX {output}/scans/xml/_top_1000_tcp_naabunmap.xml {target}'; \
 searchsploit --nmap {output}/scans/xml/_top_1000_tcp_naabunmap.xml > {output}/scans/searchsploit-naabunmap-tcp.ansi"
         
         return await runcommand(cmd=cmd, tag=tag, output=output, module=module)
