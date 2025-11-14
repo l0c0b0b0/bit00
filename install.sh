@@ -69,7 +69,7 @@ check_tool naabu || true
 echo ""
 echo "3. Install Packages and Tools:"
 echo "This will install required packages and tools."
-printf "Do you want to proceed? (Y/n): "
+#printf "Do you want to proceed? (Y/n): "
 read confirm_install
 
 case "$confirm_install" in
@@ -108,7 +108,7 @@ echo ""
 echo "4. Config Golang:"
 #echo "Default: GOROOT=/usr/bin/go"
 echo "Default: GOPATH=/opt/go"
-printf "Use default Go paths? (Y/n): "
+#printf "Use default Go paths? (Y/n): "
 read go_confirm
 
 case "$go_confirm" in
@@ -152,7 +152,7 @@ export PATH="\$PATH:\$GOPATH/bin"
 # 5. Install Vulnx
 echo ""
 echo "5. Install Vulnx:"
-printf "Install Vulnx? (Y/n): "
+#printf "Install Vulnx? (Y/n): "
 read vulnx_confirm
 
 case "$vulnx_confirm" in
