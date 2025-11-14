@@ -12,7 +12,7 @@ class NucleiHttp:
     description: str = "http scanning with nuclei"
     tag: List[str] = field(default_factory=lambda: ["scans", "NucleiHttp"])
     supported_modules: List[str] = field(default_factory=lambda: ["netscan"])
-    services_matches: Tuple[str, ...] = field(default=('^http', '^https'))
+    services_matches: Tuple[str, ...] = field(default=('^http', '^http-proxy', '^https'))
     run_once: bool = False
         
     async def run(target, tag, output, service, protocol, port, module):
