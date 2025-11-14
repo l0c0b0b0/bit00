@@ -100,11 +100,11 @@ echo ""
 echo ""
 echo "4. Install Vulnx:"
 
-echo "[+] Installing Vulnx in dest: $GOPATH/bin/vulnx"
+echo "[+] Installing Vulnx in dest: $HOME/go/bin/vulnx"
 /usr/bin/go install github.com/projectdiscovery/cvemap/cmd/vulnx@latest
         
 echo "[+] Changing name because there is a tool on github python called vulnx"
-/usr/bin/sudo ln -sf "$GOPATH/bin/vulnx" /usr/local/bin/vulnx00
+/usr/bin/sudo ln -sf "$HOME/go/bin/vulnx" /usr/local/bin/vulnx00
 echo "Accessible from vulnx00 [Ok]"
 
 # 5. Install Bit00 framework
