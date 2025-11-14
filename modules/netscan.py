@@ -65,11 +65,85 @@ class netscan:
                 return True
         else:
             return True
+    
+    def guess_services_by_port(self, port):
+        """Guess service by port number with improved tcpwrapped handling"""
+        # Convert port to string for consistent comparison
+        port_str = str(port)
+    
+        insecure_ports = {
+            '20':'ftp', '21':'ftp', '22':'ssh', '23':'telnet', '25':'smtp', '53':'domain', 
+            '69':'tftp', '79':'finger', '80':'http', '88':'kerberos', '109':'pop3', '110':'pop3', 
+            '111':'rpcbind', '119':'nntp', '135':'msrpc', '139':'netbios-ssn', '143':'imap', 
+            '161':'snmp', '220':'imap', '389':'ldap', '433':'nntp', '445':'smb', '587':'smtp', 
+            '631':'ipp', '873':'rsync', '1098':'java-rmi', '1099':'java-rmi', '1433':'mssql', 
+            '1521':'oracle', '2049':'nfs', '2483':'oracle', '3020':'smb', '3306':'mysql', 
+            '3389':'rdp', '3632':'distccd', '5060':'asterisk', '5500':'vnc', '5900':'vnc', 
+            '5985':'wsman', '6379':'redis', '8080':'http-proxy', '27017':'mongod', 
+            '27018':'mongod', '27019':'mongod'
+        }
+    
+        secure_ports = {
+            '443':'https', '465':'smtp', '563':'nntp', '585':'imaps', '593':'msrpc', 
+            '636':'ldap', '989':'ftp', '990':'ftp', '992':'telnet', '993':'imaps', 
+            '995':'pop3s', '2484':'oracle', '5061':'asterisk', '5986':'wsman'
+        }
+    
+        # Check insecure ports first
+        if port_str in insecure_ports:
+            return insecure_ports[port_str]
+    
+        # Check secure ports
+        if port_str in secure_ports:
+            return f"ssl/{secure_ports[port_str]}"
+    
+        # Return None if no match found
+        return None
+    
+    def is_tcpwrapped_service(self, service):
+        """Check if service indicates tcpwrapped with multiple detection methods"""
+        if not service:
+            return False
+    
+        service_lower = service.lower()
+    
+        # Multiple ways tcpwrapped might appear
+        tcpwrapped_indicators = [
+            'tcpwrapped',
+            'tcp-wrapped', 
+            'tcp_wrapped',
+            'wrapped'
+        ]
+    
+        # Exact match or contains tcpwrapped
+        return (service_lower in tcpwrapped_indicators or 
+                any(indicator in service_lower for indicator in tcpwrapped_indicators))
 
     async def services_scan(self, protocol: str, port: int, service:str)-> None:
 
-        debug("Starting NetScan scanning {bmagenta}{service}:{port}{rst} on: {byellow}{target}{rst} ", 
-                target=self.target, service=service)
+        """Scan services with improved tcpwrapped handling"""
+    
+        debug("Starting NetScan scanning {bmagenta}{service}:{port}{rst} on: {byellow}{target}{rst}", 
+              target=self.target, service=service, port=port)
+    
+        original_service = service
+    
+        # Improved tcpwrapped detection and handling
+        if self.is_tcpwrapped_service(service):
+            info("Detected tcpwrapped service on port {port}, attempting to guess actual service", 
+                  port=port)
+        
+            guessed_service = self.guess_services_by_port(port)
+        
+            if guessed_service:
+                service = guessed_service
+                debug("Guessed service for port {port}: {bgreen}{service}{rst} (was: {original})", 
+                      port=port, service=service, original=original_service)
+            else:
+                error("Could not guess service for tcpwrapped port {port}, using original: {service}", 
+                        port=port, service=original_service)
+                
+                # service = f"unknown-tcpwrapped-{port}"
         
         secure = any(x in service.lower() for x in ['ssl', 'tls', 'https'])
         
