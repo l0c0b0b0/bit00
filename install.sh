@@ -117,7 +117,7 @@ echo "Default: GOPATH=/opt/go"
         #read go_root
 printf "Set Go directory path: "
 #read go_path
-        ;;
+#        ;;
 #    *)
         #go_root="/usr/bin/go"
 go_path="/opt/go"
