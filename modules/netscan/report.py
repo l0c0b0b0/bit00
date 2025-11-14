@@ -106,7 +106,7 @@ class NetScanParser:
     def parse_netscan_data(self, patterns_log_path):
         """Parse NETSCAN data from a single patterns.log file"""
         netscan_entries = 0
-    
+
         try:
             with open(patterns_log_path, 'r', encoding='utf-8', errors='ignore') as f:
                 for line_num, line in enumerate(f, 1):
@@ -122,95 +122,91 @@ class NetScanParser:
                     if line.startswith('[*] '):
                         line = line[4:]  # Remove "[*] "
                 
-                    # Parse the line
+                    # Parse the line - handle both formats
                     pattern = r'^\[([^\]]+)\]:([^:]+):([^:]+):([^:]+):([^:]+):([^:]+):?(.*)$'
                     match = re.match(pattern, line)
                 
                     if not match:
                         debug(f"    ✗ Line {line_num} doesn't match expected format")
                         continue
-                
-                    # Extract all groups
+
                     timestamp = match.group(1)  # "20251109:21.53.15"
                     phase = match.group(2)      # "portscan" or "scans"
                     plugin = match.group(3)     # "NmapTCPTop1000" or "NmapHttp"
-                    field4 = match.group(4)
-                    field5 = match.group(5)
-                    field6 = match.group(6)
-                    field7 = match.group(7)     # Will be empty string if not present
-                
-                    # Handle different phases
+                                    
+                    # Handle different phases with different field mappings
                     if phase == 'portscan':
-                        # Format: [timestamp]:portscan:plugin:ip:portscan:service_details
-                        ip_address = field4
-                        context = field5
-                        service_details = field6
+                        # Format: [timestamp]:portscan:plugin:ip:service_details:context
+                        # Groups: 1:timestamp, 2:phase, 3:plugin, 4:ip, 5:service_details, 6:context
+                        ip_address = match.group(4)
+                        service_details = match.group(5)
+                        context = match.group(6)
                     
                         netscan_entries += 1
                         self._process_netscan_entry(plugin, context, ip_address, service_details)
                         debug(f"    Processed NETSCAN entry #{netscan_entries}")
-                    
+                
                     elif phase == 'scans':
-                        # Format: [timestamp]:scans:plugin:service:ip:flag:details
-                        service = field4        # "tcp/443/https"
-                        ip_address = field5     # "200.87.125.227"
-                        flag_type = field6      # "vuln" or "cve"
-                        details = field7        # "State: VULNERABLE" or "CVE-2011-3192"
+                        # Format: [timestamp]:scans:plugin:service:ip:flag:context
+                        # Groups: 1:timestamp, 2:phase, 3:plugin, 4:service, 5:ip, 6:flag, 7:context
+                        service = match.group(4)
+                        ip_address = match.group(5)
+                        flag_type = match.group(6)  # "vuln", "cve", or "tech"
+                        context = match.group(7)
                     
                         debug(f"    {flag_type.upper()} Found - Plugin: '{plugin}', Target: '{ip_address}', Service: '{service}'")
-                        debug(f"    {flag_type.upper()} Details: {details}")
+                        debug(f"    {flag_type.upper()} Details: {context}")
                     
                         # Store vulnerability information
                         if ip_address not in self.netscan_data:
                             self.netscan_data[ip_address] = {'os': 'Unknown', 'ttl': None, 'services': []}
                     
                         if flag_type == 'cve':
-                            self.netscan_data[ip_address]['services'].append((plugin, f"CVE: {details}"))
+                            self.netscan_data[ip_address]['services'].append((plugin, f"{service} CVE => {context}"))
                         elif flag_type == 'vuln':
-                            self.netscan_data[ip_address]['services'].append((plugin, f"VULN: {details}"))
+                            self.netscan_data[ip_address]['services'].append((plugin, f"{service} VULN => {context}"))
                         elif flag_type == 'tech':
-                            self.netscan_data[ip_address]['services'].append((plugin, f"TECH: {details}"))
+                            self.netscan_data[ip_address]['services'].append((plugin, f"{service} TECH => {context}"))
+                        else:
+                            self.netscan_data[ip_address]['services'].append((plugin, f"{service} => {context}"))
 
                     else:
                         debug(f"    Skipping - unknown phase: '{phase}'")
 
             debug(f"  Processed {netscan_entries} NETSCAN entries")
-        
+
         except Exception as e:
             error(f"  Error parsing log file: {e}")
             import traceback
             traceback.print_exc()
-    
+
         return self.netscan_data
 
     def _process_netscan_entry(self, plugin, context, ip_address, service_details):
         """Process a single NETSCAN entry"""
-        # Validate IP address
-        #if not self._is_valid_ip(ip_address):
-        #    debug(f"\tInvalid IP: {ip_address}")
-        #    return
+        
         if not self._is_valid_target(ip_address):
             debug(f"\tInvalid target: {ip_address}")
             return
 
-        # Extract TTL from service_details (look for numbers at the end)
+        # Extract TTL from service_details (look for numbers in parentheses)
         ttl = self._extract_ttl(service_details)
-        os_type = "Linux" if ttl and ttl < 64 else "Windows" if ttl else "Unknown"
-        
-        # Store the data
+        os_type = "Linux" if ttl and ttl < 64 else "Windows" if ttl and ttl > 64 else "Unknown"
+    
+        # Initialize IP entry if it doesn't exist
+        if ip_address not in self.netscan_data:
+            self.netscan_data[ip_address] = {'os': 'Unknown', 'ttl': None, 'services': []}
+    
+        # Update OS and TTL information
         self.netscan_data[ip_address]['os'] = os_type
         self.netscan_data[ip_address]['ttl'] = ttl
 
         # Create service description
-        if context == 'portscan':
-            service_desc = f"portscan:{service_details}"
-        elif context in ['vuln', 'cve', 'tech']:
-            service_desc = f"{context}:{service_details}"
-        else:
-            service_desc = f"{context}:{service_details}"
-        
+        service_desc = f"{service_details}"
+    
+        # Add the service entry
         self.netscan_data[ip_address]['services'].append((plugin, service_desc))
-        
+    
         debug(f"\tAdded service for {ip_address}: {plugin} - {service_desc} (TTL: {ttl}, OS: {os_type})")
 
     def _is_valid_ip(self, ip):
@@ -235,14 +231,15 @@ class NetScanParser:
         """Extract TTL value from service details"""
         if not service_details:
             return None
-    
-        # Priority 1: TTL in parentheses (most common in nmap output)
+
+        # Priority 1: TTL in parentheses (most common in your data)
+        # Example: "tcp/443/ssl => (52) nginx 1.24.0"
         ttl_patterns = [
-            r'\((\d{1,3})\)\s*$',    # Numbers in parentheses at end
-            r'\bttl[=\s:]*(\d+)',    # ttl=64, ttl: 128
-            r'\bTTL[=\s:]*(\d+)',    # TTL=64, TTL: 128
+            r'\((\d{1,3})\)',                    # (52), (51)
+            r'\bttl[=\s:]*(\d+)',               # ttl=64, ttl: 128
+            r'\bTTL[=\s:]*(\d+)',               # TTL=64, TTL: 128
         ]
-    
+
         for pattern in ttl_patterns:
             match = re.search(pattern, service_details, re.IGNORECASE)
             if match:
@@ -252,7 +249,7 @@ class NetScanParser:
                         return ttl
                 except ValueError:
                     continue
-    
+
         return None
 
 def generate_netscan_text(netscan_data, output_dir):

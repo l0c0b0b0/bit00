@@ -29,33 +29,29 @@ class RegexPatterns:
     
     async def parse_service_line(self, line: str):
         """Parse Nmap service detection line"""
-        
-        # Nmap service line e.g.: "80/tcp open http Microsoft IIS httpd 10.0 syn-ack ttl 125" 
-        NMAP_SERVICE_LINE = re.compile(r'^(?P<port>\d+)/(?:tcp|udp)\s+\S+\s+(?P<service>[A-Za-z0-9_.+-]+)\s*(?P<version>.*)$',re.IGNORECASE)
-        # TTL (syn-ack ttl 125) or (ttl 125)     
-        TTL_RE = re.compile(r'(?i)(?:syn-ack\s+)?ttl\s+(?P<ttl>\d+)') 
-        
+   
+        # More flexible regex that handles various Nmap output formats
+        NMAP_SERVICE_LINE = re.compile(
+            r'^(?P<port>\d+)/(?P<protocol>tcp|udp)\s+'  # port/protocol
+            r'\S+\s+'  # state (open/filtered/closed)
+            r'(?P<service>[^\s]+)\s+'  # service name
+            r'(?:.*?\bttl\s+(?P<ttl>\d+|\?))?\s*'  # TTL capture (optional)
+            r'(?P<version>.*)$',  # version info
+            re.IGNORECASE
+        )
+    
         m = NMAP_SERVICE_LINE.search(line)
         if not m:
             return None
+        
         port = m.group('port')
         service = m.group('service')
-        version = (m.group('version') or '').strip()
+        ttl = m.group('ttl') or ''
+        version = m.group('version').strip()
+    
+        # Additional cleanup for version field
+        version = re.sub(r'^\s*(?:syn-ack|ack|rst-ack)\s+', '', version, flags=re.IGNORECASE).strip()
         
-        # If service is ssl/tls and version starts with a tunneled-proto token like "/http",
-        # strip that token so it doesn't bleed into the version field in logs.
-        if service and service.lower() in ('ssl', 'tls') and version.startswith('/'):
-            version = re.sub(r'^/[A-Za-z0-9_.+-]+\s*', '', version)
-        
-        ttl = ''
-        mt = TTL_RE.search(line)
-        if mt:
-            ttl = mt.group('ttl')
-            version = TTL_RE.sub('', version).strip()
-            # Remove possible leftover 'syn-ack' token
-            version = re.sub(r'(?i)\bsyn-ack\b', '', version).strip()
-        
-        version = re.sub(r'\s{2,}', ' ', version)
         return port, service, version, ttl
     
     async def read_stream(self, stream, output, tag='?', color=Fore.BLUE):
@@ -199,17 +195,7 @@ class RegexPatterns:
                     proto = parse_match.group('protocol') if 'protocol' in parse_match.re.groupindex else None
                 except Exception:
                     proto = None
-              
-                try:
-                    port = int(parse_match.group('port') if 'port' in parse_match.re.groupindex else None)
-                except Exception:
-                    port = None
 
-                try:
-                    service = int(parse_match.group('service') if 'service' in parse_match.re.groupindex else None)
-                except Exception:
-                    service = None
-                
                 if not proto:
                     proto = 'tcp'
 
@@ -217,21 +203,21 @@ class RegexPatterns:
                 
                 async with LOCK:
                     if _match:
-                        _port, _service, version, ttl = _match
+                        port, service, version, ttl = _match
                         if not version and ttl:
-                            srv = (proto, _port, _service, None, ttl)
-                            log_pattern(output, tag, "portscan", f"{proto}/{_port}/{_service} => ({ttl})")
+                            srv = (proto, port, service, None, ttl)
+                            log_pattern(output, tag, f"{proto}/{port}/{service} => ({ttl})")
                         
                         if not ttl and version:
-                            srv = (proto, _port, _service, version, None)
-                            log_pattern(output, tag, "portscan", f"{proto}/{_port}/{_service} => {version}")
+                            srv = (proto, port, service, version, None)
+                            log_pattern(output, tag, f"{proto}/{port}/{service} => {version}")
                         
                         if not ttl and not version:
-                            srv = (proto, _port, _service, None, None)
-                            log_pattern(output, tag, "portscan", f"{proto}/{_port}/{_service}")
+                            srv = (proto, port, service, None, None)
+                            log_pattern(output, tag, f"{proto}/{port}/{service}")
                         
-                        srv = (proto, _port, _service, version, ttl)
-                        log_pattern(output, tag, "portscan", f"{proto}/{_port}/{_service} => {version} ({ttl})")
+                        srv = (proto, port, service, version, ttl)
+                        log_pattern(output, tag, f"{proto}/{port}/{service} => ({ttl}) {version}")
                 
                 if srv not in matches:
                     matches.append(srv)
