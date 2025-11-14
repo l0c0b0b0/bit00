@@ -109,20 +109,20 @@ echo "4. Config Golang:"
 #echo "Default: GOROOT=/usr/bin/go"
 echo "Default: GOPATH=/opt/go"
 #printf "Use default Go paths? (Y/n): "
-read go_confirm
+#read go_confirm
 
-case "$go_confirm" in
-    [nN]|[nN][oO])
+#case "$go_confirm" in
+#    [nN]|[nN][oO])
         #printf "Set Go executable path: "
         #read go_root
-        printf "Set Go directory path: "
-        read go_path
+printf "Set Go directory path: "
+#read go_path
         ;;
-    *)
+#    *)
         #go_root="/usr/bin/go"
-        go_path="/opt/go"
-        ;;
-esac
+go_path="/opt/go"
+#        ;;
+#esac
 
 # Create Go directories
 /usr/bin/sudo mkdir -p "$go_path"/bin "$go_path"/src "$go_path"/pkg
@@ -153,21 +153,21 @@ export PATH="\$PATH:\$GOPATH/bin"
 echo ""
 echo "5. Install Vulnx:"
 #printf "Install Vulnx? (Y/n): "
-read vulnx_confirm
+#read vulnx_confirm
 
-case "$vulnx_confirm" in
-    [nN]|[nN][oO])
-        echo "Skipping Vulnx installation."
-        ;;
-    *)
-        echo "[+] Installing Vulnx in dest: $GOPATH/bin/vulnx"
-        /usr/bin/go install github.com/projectdiscovery/cvemap/cmd/vulnx@latest
+#case "$vulnx_confirm" in
+#    [nN]|[nN][oO])
+#        echo "Skipping Vulnx installation."
+#        ;;
+#    *)
+echo "[+] Installing Vulnx in dest: $GOPATH/bin/vulnx"
+/usr/bin/go install github.com/projectdiscovery/cvemap/cmd/vulnx@latest
         
-        echo "[+] Changing name because there is a tool on github python called vulnx"
-        /usr/bin/sudo ln -sf "$GOPATH/bin/vulnx" /usr/local/bin/vulnx00
-        echo "Accessible from vulnx00 [Ok]"
-        ;;
-esac
+echo "[+] Changing name because there is a tool on github python called vulnx"
+/usr/bin/sudo ln -sf "$GOPATH/bin/vulnx" /usr/local/bin/vulnx00
+echo "Accessible from vulnx00 [Ok]"
+#        ;;
+#esac
 
 # 6. Verify installation
 echo ""
