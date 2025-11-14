@@ -115,7 +115,7 @@ echo "Default: GOPATH=/opt/go"
 #    [nN]|[nN][oO])
         #printf "Set Go executable path: "
         #read go_root
-printf "Set Go directory path: "
+#printf "Set Go directory path: "
 #read go_path
 #        ;;
 #    *)
