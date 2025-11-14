@@ -70,14 +70,14 @@ echo ""
 echo "3. Install Packages and Tools:"
 echo "This will install required packages and tools."
 #printf "Do you want to proceed? (Y/n): "
-read confirm_install
+#read confirm_install
 
-case "$confirm_install" in
-    [nN]|[nN][oO])
-        echo "Installation cancelled."
-        exit 0
-        ;;
-    *)
+#case "$confirm_install" in
+#    [nN]|[nN][oO])
+#        echo "Installation cancelled."
+#        exit 0
+#        ;;
+#    *)
         echo "[+] Start installing"
         echo "[+] Updating OS:"
         /usr/bin/sudo apt update
@@ -90,8 +90,8 @@ case "$confirm_install" in
         
         echo "[+] Installing NETSCAN Tools:"
         /usr/bin/sudo apt install -y seclists dnsrecon naabu enum4linux feroxbuster gobuster impacket-scripts nbtscan nmap redis-tools smbclient smbmap snmp sslscan sipvicious whatweb cmseek nuclei netexec ffuf
-        ;;
-esac
+#        ;;
+#esac
 
 # 3.1 Update nuclei an another tools
 echo ""
